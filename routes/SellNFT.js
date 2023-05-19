@@ -5,7 +5,7 @@ const isTimeToSell = require('../components/sellTimeRange')
 
 const SellNFT = async (req, res) => {
     try{
-        if(isTimeToSell()){
+        if(!isTimeToSell()){
             return res.json({
                 success: false,
                 message: 'Not Sell Time'
@@ -25,6 +25,7 @@ const SellNFT = async (req, res) => {
         }
 
         const {email, password} = account
+        console.log(email)
 
         var browser = await pup.launch({
             headless: false,
@@ -81,11 +82,11 @@ const SellNFT = async (req, res) => {
 
 
 
-        await Accounts.updateOne({ email: email }, {
-            reserve_pending: true,
-            sell_pending: false,
-            $inc: { total_sell: 1 }
-        })
+        // await Accounts.updateOne({ email: email }, {
+        //     reserve_pending: true,
+        //     sell_pending: false,
+        //     $inc: { total_sell: 1 }
+        // })
 
         res.json({
             success: true
@@ -99,8 +100,8 @@ const SellNFT = async (req, res) => {
         })
     }
     finally{
-        await page?.close()
-        await browser?.close()
+        // await page?.close()
+        // await browser?.close()
     }
 }
 

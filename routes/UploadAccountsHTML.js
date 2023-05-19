@@ -14,7 +14,7 @@ const UploadAccountsHTML = (req, res) => {
             <input type="text" name="username" id="username" required><br><br>
             
             <label for="password">Password:</label>
-            <input type="password" name="password" id="password" required><br><br>
+            <input type="text" name="password" id="password" required><br><br>
             
             <button type="submit">Submit</button>
             </form>

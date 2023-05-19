@@ -11,7 +11,7 @@ const isReservationTime = () => {
     const currentHour = nigerianTime.getHours();
 
     // Check if the current hour is within the desired time range
-    const isWithinTimeRange = (currentHour >= 8 && currentHour <= 12) || (currentHour >= 17 && currentHour <= 21);
+    const isWithinTimeRange = (currentHour >= 8 && currentHour < 12) || (currentHour >= 17 && currentHour < 21);
 
     return isWithinTimeRange
 }
