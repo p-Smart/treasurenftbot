@@ -30,17 +30,17 @@ const SellNFT = async (req, res) => {
         console.log('Sell')
         console.log(email)
 
-        var browser = await pup.launch({
-            headless: false,
-            executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
-            defaultViewport: { width: 1500, height: 736 }
-        })
+        // var browser = await pup.launch({
+        //     headless: false,
+        //     executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
+        //     defaultViewport: { width: 1500, height: 736 }
+        // })
 
-        // var browser = await pup.connect({
-        //     browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
-        //     defaultViewport: { width: 1500, height: 736 },
-        //     args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        // }, {timeout: 0})
+        var browser = await pup.connect({
+            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
+            defaultViewport: { width: 1500, height: 736 },
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        }, {timeout: 0})
 
         res.json({
             success: true,
