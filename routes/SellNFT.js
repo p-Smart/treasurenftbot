@@ -30,17 +30,17 @@ const SellNFT = async (req, res) => {
         console.log('Sell')
         console.log(email)
 
-        // var browser = await pup.launch({
-        //     headless: 'new',
-        //     executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
-        //     defaultViewport: { width: 1500, height: 736 }
-        // })
+        var browser = await pup.launch({
+            headless: false,
+            executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
+            defaultViewport: { width: 1500, height: 736 }
+        })
 
-        var browser = await pup.connect({
-            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
-            defaultViewport: { width: 1500, height: 736 },
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        }, {timeout: 0})
+        // var browser = await pup.connect({
+        //     browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
+        //     defaultViewport: { width: 1500, height: 736 },
+        //     args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        // }, {timeout: 0})
 
         res.json({
             success: true,
@@ -103,6 +103,8 @@ const SellNFT = async (req, res) => {
         await page.waitForResponse((response) => {
             return response.url().includes('https://treasurenft.xyz/gateway/app/NFTItem/mine')
         })
+
+        console.log('Sell Page Loaded')
         
 
         await page.evaluate( () => {
@@ -110,20 +112,28 @@ const SellNFT = async (req, res) => {
             sellButton.click()
         } )
 
+        console.log('Sell Button Clicked')
+
 
         await page.waitForResponse((response) => {
             return response.url().includes('https://treasurenft.xyz/gateway/app/level/fee')
         })
+
+        console.log('Sell Confirmation page opened')
 
         await page.evaluate( () => {
             const confirmSellButton = document.querySelector('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long')
             confirmSellButton.click()
         } )
 
+        console.log('Sell Button Clicked')
+
         // Wait for Sell Request
         await page.waitForResponse((response) => {
             return response.url().includes('https://treasurenft.xyz/gateway/app/NFTItem/status')
         })
+
+        console.log('Sell Confirmed')
 
 
         await Accounts.updateOne({ email: email }, {
