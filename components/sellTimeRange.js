@@ -13,15 +13,17 @@ const isTimeToSell = () => {
     const currentMinute = nigerianTime.getMinutes();
 
     // Check if the current time is within the desired time ranges
-    
+
     const isWithinTimeRange =
     (currentHour === 13 && currentMinute >= 40) ||
     (currentHour === 14) ||
-    (currentHour === 15 && currentMinute <= 40) ||
+    (currentHour === 15) ||
+    (currentHour === 16 && currentMinute <= 40) ||
 
     (currentHour === 22 && currentMinute >= 40) ||
     (currentHour === 23) ||
-    (currentHour === 0 && currentMinute <= 40)
+    (currentHour === 0) ||
+    (currentHour === 1 && currentMinute <= 40)
 
     return isWithinTimeRange
 }

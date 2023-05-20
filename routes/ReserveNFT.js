@@ -1,6 +1,7 @@
 const pup = require('puppeteer-core')
 const isReservationTime = require('../components/reservationTimeRange')
 const Accounts = require('../models/Accounts')
+const {BROWSERLESS_KEY} = process.env
 
 
 const ReserveNft = async (req, res) => {
@@ -27,11 +28,18 @@ const ReserveNft = async (req, res) => {
         const {email, password} = account
         console.log(email)
 
-        var browser = await pup.launch({
-            headless: 'new',
-            executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
-            defaultViewport: { width: 1500, height: 736 }
-        })
+        // var browser = await pup.launch({
+        //     headless: 'new',
+        //     executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
+        //     defaultViewport: { width: 1500, height: 736 }
+        // })
+
+        var browser = await pup.connect({
+            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
+            defaultViewport: { width: 1500, height: 736 },
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        }, {timeout: 0})
+
         var page = await browser.newPage()
         await page.setDefaultTimeout(0)
         await page.setRequestInterception(true);
@@ -43,6 +51,7 @@ const ReserveNft = async (req, res) => {
 
 
         await page.goto('https://treasurenft.xyz/')
+        console.log('Gone to website')
 
         // Click on Account Menu (to Login)
         await page.evaluate( () => {
@@ -59,11 +68,12 @@ const ReserveNft = async (req, res) => {
         const inputs = await page.$$('.ivu-input.ivu-input-default');
         for (let i = 0; i < inputs.length; i++) {
         if (i === 0) {
-            await inputs[i].type(email, {delay: 200});
+            await inputs[i].type(email, {delay: 50});
         } else if (i === 1) {
-            await inputs[i].type(password, {delay: 200});
+            await inputs[i].type(password, {delay: 50});
         }
         }
+        console.log('Typed Details')
 
         // Click on Login
         await page.evaluate( () => {
@@ -72,8 +82,11 @@ const ReserveNft = async (req, res) => {
         } )
 
         await page.waitForFunction(() => !document.querySelector('.loginModal'))
+        console.log('Logged In Successfully')
 
         await page.goto('https://treasurenft.xyz/#/store/defi')
+
+        console.log('Gone to Reservation Page')
 
         await page.waitForSelector((`button.ivu-btn.ivu-btn-success.ivu-btn-long`))
 
@@ -89,8 +102,9 @@ const ReserveNft = async (req, res) => {
         await page.evaluate( () => {
             const confirmReserveButton = document.querySelector('.reserve-wrap button')
             confirmReserveButton.click()
-            setTimeout( () => console.log('Done'), 1000 )
         } )
+
+        await page.waitForTimeout(2000)
 
         await Accounts.updateOne({ email: email }, {
             reserve_pending: false,
