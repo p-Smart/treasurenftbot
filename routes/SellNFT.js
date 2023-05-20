@@ -94,10 +94,11 @@ const SellNFT = async (req, res) => {
 
         await page.goto('https://treasurenft.xyz/#/collection')
 
-        await page.evaluate( () => {
-            const collectionTab = Array.from(document.querySelectorAll('.ivu-tabs-tab'))[1]
-            setTimeout( () => collectionTab.click(), 2000 )
-        } )
+        // await page.evaluate( () => {
+        //     const collectionTab = Array.from(document.querySelectorAll('.ivu-tabs-tab'))[1]
+        //     setTimeout( () => collectionTab.click(), 2000 )
+        // } )
+        await page.click('.ivu-tabs-tab:nth-child(3)')
         console.log('Gone to Sell Page')
 
         await page.waitForSelector('.pro-list-wrap .ivu-col')
@@ -105,10 +106,7 @@ const SellNFT = async (req, res) => {
         console.log('Sell Page Loaded')
         
 
-        await page.evaluate( () => {
-            const sellButton = document.querySelector('button.block-btn.ivu-btn.ivu-btn-primary.ivu-btn-long')
-            sellButton.click()
-        } )
+        await page.click('button.block-btn.ivu-btn.ivu-btn-primary.ivu-btn-long')
 
         console.log('Sell Button Clicked')
 
@@ -116,10 +114,7 @@ const SellNFT = async (req, res) => {
 
         console.log('Sell Confirmation page opened')
 
-        await page.evaluate( () => {
-            const confirmSellButton = document.querySelector('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long')
-            confirmSellButton.click()
-        } )
+        await page.click('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long')
 
         console.log('Sell Button Clicked')
 
