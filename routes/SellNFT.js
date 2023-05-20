@@ -49,7 +49,7 @@ const SellNFT = async (req, res) => {
 
 
         var page = await browser.newPage()
-        await page.setDefaultTimeout(30000)
+        await page.setDefaultTimeout(60000)
         await page.setRequestInterception(true);
 
         await page.on('request', (request) => {
