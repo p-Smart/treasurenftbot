@@ -49,7 +49,7 @@ const SellNFT = async (req, res) => {
 
 
         var page = await browser.newPage()
-        await page.setDefaultTimeout(60000)
+        await page.setDefaultTimeout(30000)
         await page.setRequestInterception(true);
 
         await page.on('request', (request) => {
@@ -101,7 +101,7 @@ const SellNFT = async (req, res) => {
         console.log('Gone to Sell Page')
 
         await page.waitForResponse((response) => {
-            return response.url().includes('https://treasurenft.xyz/gateway/app/NFTItem/mine')
+            return response.url().includes('/NFTItem/mine')
         })
 
         console.log('Sell Page Loaded')
@@ -116,7 +116,7 @@ const SellNFT = async (req, res) => {
 
 
         await page.waitForResponse((response) => {
-            return response.url().includes('https://treasurenft.xyz/gateway/app/level/fee')
+            return response.url().includes('/level/fee')
         })
 
         console.log('Sell Confirmation page opened')
@@ -130,7 +130,7 @@ const SellNFT = async (req, res) => {
 
         // Wait for Sell Request
         await page.waitForResponse((response) => {
-            return response.url().includes('https://treasurenft.xyz/gateway/app/NFTItem/status')
+            return response.url().includes('/NFTItem/status')
         })
 
         console.log('Sell Confirmed')
