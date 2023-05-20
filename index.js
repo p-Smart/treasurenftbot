@@ -7,6 +7,7 @@ const ReserveNft = require('./routes/ReserveNFT')
 const SellNFT = require('./routes/SellNFT')
 const UploadAccountsHTML = require('./routes/UploadAccountsHTML')
 const UploadAccounts = require('./routes/UploadAccounts')
+const Accounts = require('./models/Accounts')
 
 
 // app.use(async (_, __, next) => {
@@ -34,12 +35,11 @@ app.post('/upload-accounts', UploadAccounts)
 
 
 // app.get('/test', async (_, res) => {
-//   setTimeout( () => {
-//     console.log('Job Done')
-//   }, 10000 )
+//   const result = await Accounts.updateMany( {reserve_pending: false}, {last_sell: new Date(new Date().setDate(new Date().getDate() - 1))} )
 
 //   res.json({
-//     success: true
+//     success: true,
+//     result: result
 //   });
 // })
 

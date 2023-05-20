@@ -19,6 +19,8 @@ const UploadAccounts = async ({body, ...req}, res) => {
             total_sell: 0,
             reserve_pending: true,
             sell_pending: false,
+            last_reserve: new Date(new Date().setDate(new Date().getDate() - 1)),
+            last_sell: new Date(new Date().setDate(new Date().getDate() - 1)),
         });
       
         res.json({

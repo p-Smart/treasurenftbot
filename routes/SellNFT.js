@@ -1,6 +1,7 @@
 const pup = require('puppeteer-core')
 const Accounts = require('../models/Accounts')
 const isTimeToSell = require('../components/sellTimeRange')
+const { getStartOfYesterDay, getEndOfYesterday } = require('../components/dates')
 const {BROWSERLESS_KEY} = process.env
 
 const SellNFT = async (req, res) => {
@@ -15,6 +16,7 @@ const SellNFT = async (req, res) => {
         const account = await Accounts.findOne({
             sell_pending: true,
             total_sell: {$lt: 4},
+            last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() }
         })
 
         if(!account){
@@ -127,7 +129,8 @@ const SellNFT = async (req, res) => {
         await Accounts.updateOne({ email: email }, {
             reserve_pending: true,
             sell_pending: false,
-            $inc: { total_sell: 1 }
+            $inc: { total_sell: 1 },
+            last_sell: new Date()
         })
 
         console.log('Sell Successful')

@@ -2,6 +2,7 @@ const pup = require('puppeteer-core')
 const isReservationTime = require('../components/reservationTimeRange')
 const Accounts = require('../models/Accounts')
 const {BROWSERLESS_KEY} = process.env
+const {getEndOfYesterday, getStartOfYesterDay} = require('./../components/dates')
 
 
 const ReserveNft = async (req, res) => {
@@ -16,6 +17,7 @@ const ReserveNft = async (req, res) => {
         const account = await Accounts.findOne({
             reserve_pending: true,
             total_reserved: {$lt: 4},
+            last_reserve: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() }
         })
 
         if(!account){
@@ -115,7 +117,8 @@ const ReserveNft = async (req, res) => {
         await Accounts.updateOne({ email: email }, {
             reserve_pending: false,
             sell_pending: true,
-            $inc: { total_reserved: 1 }
+            $inc: { total_reserved: 1 },
+            last_reserve: new Date()
         })
 
         console.log('Reserve Successful')
