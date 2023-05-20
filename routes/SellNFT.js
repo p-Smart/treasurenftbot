@@ -96,13 +96,11 @@ const SellNFT = async (req, res) => {
 
         await page.evaluate( () => {
             const collectionTab = Array.from(document.querySelectorAll('.ivu-tabs-tab'))[1]
-            collectionTab.click()
+            setTimeout( () => collectionTab.click(), 2000 )
         } )
         console.log('Gone to Sell Page')
 
-        await page.waitForResponse((response) => {
-            return response.url().includes('/NFTItem/mine')
-        })
+        await page.waitForSelector('.pro-list-wrap .ivu-col')
 
         console.log('Sell Page Loaded')
         
@@ -114,10 +112,7 @@ const SellNFT = async (req, res) => {
 
         console.log('Sell Button Clicked')
 
-
-        await page.waitForResponse((response) => {
-            return response.url().includes('/level/fee')
-        })
+        await page.waitForTimeout(2000)
 
         console.log('Sell Confirmation page opened')
 
@@ -128,11 +123,7 @@ const SellNFT = async (req, res) => {
 
         console.log('Sell Button Clicked')
 
-        // Wait for Sell Request
-        await page.waitForResponse((response) => {
-            return response.url().includes('/NFTItem/status')
-        })
-
+        await page.waitForTimeout(2000)
         console.log('Sell Confirmed')
 
 
