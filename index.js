@@ -33,18 +33,15 @@ app.get('/upload-accounts', UploadAccountsHTML)
 app.post('/upload-accounts', UploadAccounts)
 
 
-app.get('/test', async (_, res) => {
-  await new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Timed out');
-      resolve();
-    }, 60000);
-  });
+// app.get('/test', async (_, res) => {
+//   setTimeout( () => {
+//     console.log('Job Done')
+//   }, 10000 )
 
-  res.json({
-    success: true
-  });
-})
+//   res.json({
+//     success: true
+//   });
+// })
 
 
 

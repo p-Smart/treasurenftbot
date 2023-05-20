@@ -25,6 +25,7 @@ const SellNFT = async (req, res) => {
         }
 
         const {email, password} = account
+        console.log('Sell')
         console.log(email)
 
         // var browser = await pup.launch({
@@ -39,9 +40,14 @@ const SellNFT = async (req, res) => {
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         }, {timeout: 0})
 
+        res.json({
+            success: true,
+            message: 'Passed Sell Job on to Puppeteer...'
+        })
+
 
         var page = await browser.newPage()
-        await page.setDefaultTimeout(0)
+        await page.setDefaultTimeout(30000)
         await page.setRequestInterception(true);
 
         await page.on('request', (request) => {
@@ -51,6 +57,7 @@ const SellNFT = async (req, res) => {
 
 
         await page.goto('https://treasurenft.xyz/')
+        console.log('Gone to website')
 
         // Click on Account Menu (to Login)
         await page.evaluate( () => {
@@ -72,6 +79,7 @@ const SellNFT = async (req, res) => {
             await inputs[i].type(password, {delay: 50});
         }
         }
+        console.log('Typed Details')
 
         // Click on Login
         await page.evaluate( () => {
@@ -80,6 +88,7 @@ const SellNFT = async (req, res) => {
         } )
 
         await page.waitForFunction(() => !document.querySelector('.loginModal'))
+        console.log('Logged In Successfully')
 
         await page.goto('https://treasurenft.xyz/#/collection')
 
@@ -87,6 +96,7 @@ const SellNFT = async (req, res) => {
             const collectionTab = Array.from(document.querySelectorAll('.ivu-tabs-tab'))[1]
             collectionTab.click()
         } )
+        console.log('Gone to Sell Page')
 
         await page.waitForResponse((response) => {
             return response.url().includes('https://treasurenft.xyz/gateway/app/NFTItem/mine')
@@ -114,23 +124,29 @@ const SellNFT = async (req, res) => {
         })
 
 
-
         await Accounts.updateOne({ email: email }, {
             reserve_pending: true,
             sell_pending: false,
             $inc: { total_sell: 1 }
         })
 
-        res.json({
-            success: true
-        })
+        console.log('Sell Successful')
+
+        // res.json({
+        //     success: true,
+        // })
     }
     catch(err){
+        try{
         res.status(500).json({
             error: {
                 message: err.message
             }
         })
+        }
+        catch{
+            console.error(err.message)
+        }
     }
     finally{
         await page?.close()

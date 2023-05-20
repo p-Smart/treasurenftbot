@@ -26,6 +26,7 @@ const ReserveNft = async (req, res) => {
         }
 
         const {email, password} = account
+        console.log('Reserve')
         console.log(email)
 
         // var browser = await pup.launch({
@@ -41,8 +42,13 @@ const ReserveNft = async (req, res) => {
         }, {timeout: 0})
 
         var page = await browser.newPage()
-        await page.setDefaultTimeout(0)
+        await page.setDefaultTimeout(30000)
         await page.setRequestInterception(true);
+
+        res.json({
+            success: true,
+            message: 'Passed Reserve Job on to Puppeteer...'
+        })
 
         await page.on('request', (request) => {
         // Enable interception for the request
@@ -112,17 +118,24 @@ const ReserveNft = async (req, res) => {
             $inc: { total_reserved: 1 }
         })
 
-        res.json({
-            success: true,
-            message: 'Reserved!, waiting to sell'
-        })
+        console.log('Reserve Successful')
+
+        // res.json({
+        //     success: true,
+        //     message: 'Reserved!, waiting to sell'
+        // })
     }
     catch(err){
-        res.status(500).json({
-            error: {
-                message: err.message
-            }
-        })
+        try{
+            res.status(500).json({
+                error: {
+                    message: err.message
+                }
+            })
+        }
+        catch{
+            console.error(err.message)
+        }
     }
     finally{
         await page?.close()
