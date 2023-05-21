@@ -1,24 +1,32 @@
 const pup = require('puppeteer-core')
-const isReservationTime = require('../components/reservationTimeRange')
+const {isEveningReservationTime, isMorningReservationTime} = require('../components/reservationTimeRange')
 const Accounts = require('../models/Accounts')
 const {BROWSERLESS_KEY} = process.env
-const {getEndOfYesterday, getStartOfYesterDay} = require('./../components/dates')
 
 
 const ReserveNft = async (req, res) => {
     try{
-        if(!isReservationTime()){
+        if(!isMorningReservationTime() && !isEveningReservationTime()){
             return res.json({
                 success: false,
                 message: 'Not Reservation Time'
             })
         }
-
-        const account = await Accounts.findOne({
-            reserve_pending: true,
-            total_reserved: {$lt: 4},
-            last_reserve: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() }
-        })
+        var account;
+        if(isMorningReservationTime()){
+            account = await Accounts.findOne({
+                reserve_pending: true,
+                total_reserved: {$lt: 4},
+                morning_reservation: true
+            })    
+        }
+        if(isEveningReservationTime()){
+            account = await Accounts.findOne({
+                reserve_pending: true,
+                total_reserved: {$lt: 4},
+                evening_reservation: true
+            })
+        }
 
         if(!account){
             return res.json({
@@ -122,11 +130,6 @@ const ReserveNft = async (req, res) => {
         })
 
         console.log('Reserve Successful')
-
-        // res.json({
-        //     success: true,
-        //     message: 'Reserved!, waiting to sell'
-        // })
     }
     catch(err){
         try{
