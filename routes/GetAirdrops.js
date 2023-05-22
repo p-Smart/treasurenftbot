@@ -2,7 +2,6 @@ const login = require("../components/login")
 const Accounts = require("../models/Accounts")
 
 
-let loopEnd = false
 
 const GetAirdrops = async (_, res) => {
     try{
@@ -53,7 +52,7 @@ const GetAirdrops = async (_, res) => {
             })
         }
 
-        while(!loopEnd){
+        while(true){
             console.log('Loop Started')
             await page.click('button[data-v-a51406d4]')
             await page.waitForSelector('.ReserveCratesOpenChest-row.ivu-row')
@@ -62,14 +61,14 @@ const GetAirdrops = async (_, res) => {
             await page.waitForTimeout(2000)
             disabled = await airdropButtonDisabled(page)
             if(disabled){
-                loopEnd = true
                 console.log('All Airdrops grabbed')
-                return await Accounts.updateOne({email: email}, {
+                await Accounts.updateOne({email: email}, {
                     last_airdrop_check: new Date()
                 })
+                break
             }
         }
-
+        return console.log('Done here')
     }
     catch(err){
         try{
