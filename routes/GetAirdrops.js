@@ -47,12 +47,14 @@ const GetAirdrops = async (_, res) => {
         
         let disabled = await airdropButtonDisabled(page)
         if(disabled){
+            console.log('No Airdrop On this Account')
             return await Accounts.updateOne({email: email}, {
                 last_airdrop_check: new Date()
             })
         }
 
         while(!loopEnd){
+            console.log('Loop Started')
             await page.click('button[data-v-a51406d4]')
             await page.waitForSelector('.ReserveCratesOpenChest-row.ivu-row')
             console.log('Grabbed Airdrop')
