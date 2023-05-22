@@ -1,10 +1,9 @@
-const pup = require('puppeteer-core')
-const {isEveningReservationTime, isMorningReservationTime} = require('../components/reservationTimeRange')
+const login = require('../components/login');
+const {isEveningReservationTime, isMorningReservationTime} = require('../components/reservationTimeRange');
 const Accounts = require('../models/Accounts')
-const {BROWSERLESS_KEY} = process.env
 
 
-const ReserveNft = async (req, res) => {
+const ReserveNft = async (_, res) => {
     try{
         if(!isMorningReservationTime() && !isEveningReservationTime()){
             return res.json({
@@ -39,66 +38,7 @@ const ReserveNft = async (req, res) => {
         console.log('Reserve')
         console.log(email)
 
-        // var browser = await pup.launch({
-        //     headless: 'new',
-        //     executablePath: `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`,
-        //     defaultViewport: { width: 1500, height: 736 }
-        // })
-
-        var browser = await pup.connect({
-            browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
-            defaultViewport: { width: 1500, height: 736 },
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        }, {timeout: 0})
-
-        var page = await browser.newPage()
-        await page.setDefaultTimeout(30000)
-        await page.setRequestInterception(true);
-
-        res.json({
-            success: true,
-            message: 'Passed Reserve Job on to Puppeteer...'
-        })
-
-        await page.on('request', (request) => {
-        // Enable interception for the request
-        request.continue();
-        });
-
-
-        await page.goto('https://treasurenft.xyz/')
-        console.log('Gone to website')
-
-        // Click on Account Menu (to Login)
-        await page.evaluate( () => {
-            let menu = document.querySelectorAll('.menu-wrap-item')
-            let loginMenu = Array.from(menu)[1]
-            loginMenu.click()
-            return
-        } )
-
-        await page.waitForSelector('.ivu-input.ivu-input-default')
-
-        // Type in Userbame and Password Input Field
-
-        const inputs = await page.$$('.ivu-input.ivu-input-default');
-        for (let i = 0; i < inputs.length; i++) {
-        if (i === 0) {
-            await inputs[i].type(email, {delay: 50});
-        } else if (i === 1) {
-            await inputs[i].type(password, {delay: 50});
-        }
-        }
-        console.log('Typed Details')
-
-        // Click on Login
-        await page.evaluate( () => {
-            let loginButton = document.querySelector(`button.ivu-btn.ivu-btn-primary.ivu-btn-long`)
-            loginButton.click()
-        } )
-
-        await page.waitForFunction(() => !document.querySelector('.loginModal'))
-        console.log('Logged In Successfully')
+        var {browser, page} = await login(email, password, res)
 
         await page.goto('https://treasurenft.xyz/#/store/defi')
 

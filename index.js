@@ -8,6 +8,7 @@ const SellNFT = require('./routes/SellNFT')
 const UploadAccountsHTML = require('./routes/UploadAccountsHTML')
 const UploadAccounts = require('./routes/UploadAccounts')
 const Accounts = require('./models/Accounts')
+const GetAirdrops = require('./routes/GetAirdrops')
 
 
 // app.use(async (_, __, next) => {
@@ -33,14 +34,13 @@ app.get('/upload-accounts', UploadAccountsHTML)
 
 app.post('/upload-accounts', UploadAccounts)
 
+app.get('/get-airdrops', GetAirdrops)
+
 
 // app.get('/test', async (_, res) => {
-//   const result = await Accounts.updateMany( {evening_reservation: true}, {
-//       $inc: { total_reserved: -1 },
-//       reserve_pending: true,
-//       sell_pending: false,
-//       last_reserve: new Date(new Date().setDate(new Date().getDate() - 1)) 
-//       })
+//   const result = await Accounts.updateMany( {}, {
+//       last_airdrop_check: new Date(new Date().setDate(new Date().getDate() - 1))
+//     })
 //   // const result = await Accounts.find( {reserve_pending: true, sell_pending: false})
 //   // const result = await Accounts.find( {evening_reservation: true})
 
