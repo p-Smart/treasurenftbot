@@ -60,6 +60,7 @@ const GetAirdrops = async (_, res) => {
             disabled = await airdropButtonDisabled(page)
             if(disabled){
                 loopEnd = true
+                console.log('All Airdrops grabbed')
                 return await Accounts.updateOne({email: email}, {
                     last_airdrop_check: new Date()
                 })
