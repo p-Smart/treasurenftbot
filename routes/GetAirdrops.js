@@ -32,7 +32,8 @@ const GetAirdrops = async (_, res) => {
         var {browser, page} = await login(email, password, res)
 
         await page.goto('https://treasurenft.xyz/#/Airdrop')
-        await page.waitForTimeout(3000)
+        console.log('Gone to Airdrop Page')
+        await page.waitForTimeout(2000)
 
         const airdropButtonDisabled = async (page) => {
         return await page.evaluate( () => {
@@ -56,7 +57,7 @@ const GetAirdrops = async (_, res) => {
             await page.waitForSelector('.ReserveCratesOpenChest-row.ivu-row')
             console.log('Grabbed Airdrop')
             await page.goto('https://treasurenft.xyz/#/Airdrop')
-            await page.waitForTimeout(3000)
+            await page.waitForTimeout(2000)
             disabled = await airdropButtonDisabled(page)
             if(disabled){
                 loopEnd = true

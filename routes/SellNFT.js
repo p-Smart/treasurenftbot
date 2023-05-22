@@ -33,6 +33,7 @@ const SellNFT = async (req, res) => {
 
         await page.goto('https://treasurenft.xyz/#/collection')
 
+        await page.waitForTimeout(2000)
         await page.click('.ivu-tabs-tab:nth-child(3)')
         console.log('Gone to Sell Page')
 
