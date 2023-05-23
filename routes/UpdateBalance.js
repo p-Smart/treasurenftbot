@@ -37,7 +37,10 @@ const UpdateBalance = async (_, res) => {
         await page.goto('https://treasurenft.xyz/#/uc/userCenter')
         console.log('Gone to balance page')
 
-        await page.waitForTimeout(2000)
+
+        await page.waitForSelector('.USDTIcon h3.title-black-PR-26.text')
+        
+        await page.waitForTimeout(3000)
 
         const balance = await getBalance(page)
         
@@ -63,8 +66,8 @@ const UpdateBalance = async (_, res) => {
         }
     }
     finally{
-        await page?.close()
-        await browser?.close()
+        // await page?.close()
+        // await browser?.close()
     }
 }
 
