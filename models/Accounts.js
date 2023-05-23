@@ -35,7 +35,9 @@ const AccountsModel = new Schema({
     last_sell: dateConfig,
     morning_reservation: boolConfig,
     evening_reservation: boolConfig,
-    last_airdrop_check: Date
+    last_airdrop_check: Date,
+    last_balance_update: Date,
+    balance: Number,
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)
