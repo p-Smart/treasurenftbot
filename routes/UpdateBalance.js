@@ -66,8 +66,8 @@ const UpdateBalance = async (_, res) => {
         }
     }
     finally{
-        // await page?.close()
-        // await browser?.close()
+        await page?.close()
+        await browser?.close()
     }
 }
 
