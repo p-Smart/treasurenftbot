@@ -2,6 +2,26 @@ const login = require("../components/login")
 const Accounts = require("../models/Accounts")
 
 
+const checkAirdropAvailable = async (page) => {
+    return await page.evaluate( () => {
+        const airdropAvailable = document.querySelector('.ivu-badge .ivu-badge-count')
+        if(airdropAvailable){
+            return true
+        }
+        return false
+    } )    
+}
+
+const airdropButtonDisabled = async (page) => {
+    return await page.evaluate( () => {
+        const airdropButtonDisabled = document.querySelector('button[data-v-a51406d4]').disabled
+        if(airdropButtonDisabled){
+            return true
+        }
+        return false
+    } )
+}
+
 
 const GetAirdrops = async (_, res) => {
     try{
@@ -31,22 +51,10 @@ const GetAirdrops = async (_, res) => {
 
         var {browser, page} = await login(email, password, res)
 
-        await page.goto('https://treasurenft.xyz/#/Airdrop')
-        console.log('Gone to Airdrop Page')
         await page.waitForTimeout(2000)
+        const airdropAvailable = await checkAirdropAvailable(page)
 
-        const airdropButtonDisabled = async (page) => {
-        return await page.evaluate( () => {
-            const airdropButtonDisabled = document.querySelector('button[data-v-a51406d4]').disabled
-            if(airdropButtonDisabled){
-                return true
-            }
-            return false
-        } )
-        }
-        
-        let disabled = await airdropButtonDisabled(page)
-        if(disabled){
+        if(!airdropAvailable){
             console.log('No Airdrop On this Account')
             return await Accounts.updateOne({email: email}, {
                 last_airdrop_check: new Date()
@@ -54,10 +62,6 @@ const GetAirdrops = async (_, res) => {
         }
 
         while(true){
-            console.log('Loop Started')
-            await page.click('button[data-v-a51406d4]')
-            await page.waitForSelector('.ReserveCratesOpenChest-row.ivu-row')
-            console.log('Grabbed Airdrop')
             await page.goto('https://treasurenft.xyz/#/Airdrop')
             await page.waitForTimeout(2000)
             disabled = await airdropButtonDisabled(page)
@@ -68,6 +72,12 @@ const GetAirdrops = async (_, res) => {
                 })
                 break
             }
+            else{
+                await page.click('button[data-v-a51406d4]')
+                await page.waitForSelector('.ReserveCratesOpenChest-row.ivu-row')
+                    console.log('Grabbed Airdrop')
+            }
+
         }
         return console.log('Done here')
     }
