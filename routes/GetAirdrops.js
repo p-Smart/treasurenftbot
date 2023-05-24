@@ -29,7 +29,7 @@ const GetAirdrops = async (_, res) => {
         const endOfToday = new Date().setUTCHours(23, 59, 59, 999)
 
         const account = await Accounts.findOne({
-            reserve_pending: false,
+            morning_reservation: true,
             last_airdrop_check: {
                 $not: {
                 $gte: new Date(startOfToday),
