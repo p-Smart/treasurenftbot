@@ -14,7 +14,7 @@ const SellNFT = async (req, res) => {
 
         const account = await Accounts.findOne({
             sell_pending: true,
-            total_sell: {$lt: 4},
+            total_sell: {$lt: 5},
             last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() }
         })
 
