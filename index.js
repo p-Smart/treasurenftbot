@@ -41,7 +41,7 @@ app.get('/update-balance', UpdateBalance)
 
 
 // app.get('/test', async (_, res) => {
-//   const result = await Accounts.updateMany( {}, {
+//   const result = await Accounts.updateMany( {morning_reservation: true}, {
 //     last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))
 //     // earnings: 0
 //     })
