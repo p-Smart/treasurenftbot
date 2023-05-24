@@ -15,7 +15,7 @@ const ReserveNft = async (_, res) => {
         if(isMorningReservationTime()){
             account = await Accounts.findOne({
                 reserve_pending: true,
-                total_reserved: {$lt: 5},
+                total_reserved: {$lt: 4},
                 morning_reservation: true
             })    
         }
