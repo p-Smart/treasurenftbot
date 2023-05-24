@@ -40,18 +40,19 @@ app.get('/get-airdrops', GetAirdrops)
 app.get('/update-balance', UpdateBalance)
 
 
-// app.get('/test', async (_, res) => {
-//   const result = await Accounts.updateMany( {}, {
-//     last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))
-//     })
-//   // const result = await Accounts.find( {reserve_pending: true, sell_pending: false})
-//   // const result = await Accounts.find( {evening_reservation: true})
+app.get('/test', async (_, res) => {
+  const result = await Accounts.updateMany( {}, {
+    last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))
+    // earnings: 0
+    })
+  // const result = await Accounts.find( {reserve_pending: true, sell_pending: false})
+  // const result = await Accounts.find( {evening_reservation: true})
 
-//   res.json({
-//     success: true,
-//     result: result
-//   });
-// })
+  res.json({
+    success: true,
+    result: result
+  });
+})
 
 
 

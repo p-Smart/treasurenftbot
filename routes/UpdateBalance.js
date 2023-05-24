@@ -3,8 +3,10 @@ const Accounts = require("../models/Accounts")
 
 
 const getBalance = async (page) => {
-    // parseFloat(document.querySelector('.income-info-area > :nth-child(2) h4').textContent)
     return await page.evaluate( () => parseFloat(document.querySelector('.USDTIcon h3.title-black-PR-26.text').textContent) )
+}
+const getEarnings = async (page) => {
+    return await page.evaluate( () => parseFloat(document.querySelector('.income-info-area > :nth-child(2) h4').textContent) )
 }
 
 const UpdateBalance = async (_, res) => {
@@ -39,15 +41,20 @@ const UpdateBalance = async (_, res) => {
 
 
         await page.waitForSelector('.USDTIcon h3.title-black-PR-26.text')
+        await page.waitForSelector('.income-info-area > :nth-child(2) h4')
+
         
         await page.waitForTimeout(3000)
 
         const balance = await getBalance(page)
+        const earnings = await getEarnings(page)
         
         console.log(balance)
+        console.log(earnings)
 
         await Accounts.updateOne({email: email}, {
             balance: balance,
+            earnings: earnings,
             last_balance_update: new Date()
         })
         console.log('Balance updated')

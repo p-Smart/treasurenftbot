@@ -38,6 +38,7 @@ const AccountsModel = new Schema({
     last_airdrop_check: Date,
     last_balance_update: Date,
     balance: Number,
+    earnings: Number,
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)
