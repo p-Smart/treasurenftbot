@@ -15,7 +15,6 @@ const UpdateBalance = async (_, res) => {
         const endOfToday = new Date().setUTCHours(23, 59, 59, 999)
 
         const account = await Accounts.findOne({
-            morning_reservation: true,
             last_balance_update: {
                 $not: {
                 $gte: new Date(startOfToday),
