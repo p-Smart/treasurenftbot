@@ -12,20 +12,22 @@ const ReserveNft = async (_, res) => {
             })
         }
         var account;
-        if(isMorningReservationTime()){
-            account = await Accounts.findOne({
+        const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
+
+        account = (await Accounts.aggregate([
+            { $match: {
                 reserve_pending: true,
-                total_reserved: {$lt: 4},
-                morning_reservation: true
-            })    
-        }
-        if(isEveningReservationTime()){
-            account = await Accounts.findOne({
-                reserve_pending: true,
-                total_reserved: {$lt: 4},
-                evening_reservation: true
-            })
-        }
+                total_reserved: {$lt: 3},
+                ...(isMorningReservationTime() && { morning_reservation: true }),
+                ...(isEveningReservationTime() && { evening_reservation: true }),
+
+                reg_date: {$gt: restartDate},
+            } },
+            { $sample: { size: 1 } }
+        ]))[0]
+
+        // For testing
+        // account = await Accounts.findOne({})
 
         if(!account){
             return res.json({
@@ -38,7 +40,7 @@ const ReserveNft = async (_, res) => {
         console.log('Reserve')
         console.log(email)
 
-        var {browser, page} = await login(email, password, res)
+        var {browser, page, token} = await login(email, password, res)
 
         await page.goto('https://treasurenft.xyz/#/store/defi')
 
@@ -47,8 +49,15 @@ const ReserveNft = async (_, res) => {
         await page.waitForSelector((`button.ivu-btn.ivu-btn-success.ivu-btn-long`))
 
         await page.evaluate( () => {
+            const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
+            closeModal && closeModal.click()
+        } )
+
+        await page.waitForFunction( () => !(document.querySelector(`button.ivu-btn.ivu-btn-success.ivu-btn-long`).disabled) )
+
+        await page.evaluate( () => {
             const reserveButton = document.querySelector(`button.ivu-btn.ivu-btn-success.ivu-btn-long`)
-            setTimeout( () => reserveButton.click(), 2500 )
+            reserveButton.click()
         } )
 
         await page.waitForFunction(() => {
@@ -60,7 +69,19 @@ const ReserveNft = async (_, res) => {
             confirmReserveButton.click()
         } )
 
-        await page.waitForTimeout(2000)
+        await page.waitForResponse(async (response) => {
+            try{
+                var {message} = await response.json()
+            }
+            catch(err){}
+            return (
+                (response.url()).includes('https://treasurenft.xyz/gateway/app/reserve/insert') && 
+                response.status() === 200 && 
+                message === 'SUCCESS'
+            )
+        } )
+
+        console.log('Success')
 
         await Accounts.updateOne({ email: email }, {
             reserve_pending: false,

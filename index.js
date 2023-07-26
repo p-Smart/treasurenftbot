@@ -10,12 +10,10 @@ const UploadAccounts = require('./routes/UploadAccounts')
 const Accounts = require('./models/Accounts')
 const GetAirdrops = require('./routes/GetAirdrops')
 const UpdateBalance = require('./routes/UpdateBalance')
+const mongoose = require('mongoose')
+const { whatReservation } = require('./components/reservationTimeRange')
 
 
-// app.use(async (_, __, next) => {
-//     await connectToDB()
-//     next()
-// })
 connectToDB()
 
 
@@ -41,12 +39,9 @@ app.get('/update-balance', UpdateBalance)
 
 
 // app.get('/test', async (_, res) => {
-//   const result = await Accounts.updateMany( {morning_reservation: true}, {
-//     last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))
-//     // earnings: 0
-//     })
-//   // const result = await Accounts.find( {reserve_pending: true, sell_pending: false})
-//   // const result = await Accounts.find( {evening_reservation: true})
+
+//   const result = await Accounts.updateMany({}, {reg_date: new Date(new Date().setDate(new Date().getDate() - 30))})
+  
 
 //   res.json({
 //     success: true,
@@ -93,5 +88,14 @@ app.use((req, res, next) => {
 
 
 
-app.listen(process.env.PORT || 3000, () => console.log(`Server running...`))
+const listen = () => {
+  mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error:'))
+  mongoose.connection.once('open', () => {
+    console.log('Connected to mongoDB')
+    app.listen(process.env.PORT || 3005, () => console.log(`Server running...`))
+  })
+}
+
+
+listen()
 

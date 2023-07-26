@@ -1,53 +1,54 @@
 
 
 
-const isReservationTime = () => {
+const getNigerianTime = () => {
     const currentDate = new Date();
-
-    // Convert the current time to Nigerian time
     const nigerianTime = new Date(currentDate.toLocaleString("en-US", { timeZone: "Africa/Lagos" }));
+    return {
+        hour: nigerianTime.getHours(),
+        minute: nigerianTime.getMinutes(),
+    }
+}
 
-    // Get the current hour in Nigerian time
-    const currentHour = nigerianTime.getHours();
 
-    // Check if the current hour is within the desired time range
-    const isWithinTimeRange = (currentHour >= 8 && currentHour < 12) || (currentHour >= 17 && currentHour < 21);
 
+
+const isReservationTime = () => {
+    const {hour} = getNigerianTime()
+    const isWithinTimeRange = (hour >= 8 && hour < 12) || (hour >= 17 && hour < 21);
     return isWithinTimeRange
 }
 
 const isMorningReservationTime = () => {
-    const currentDate = new Date();
-
-    // Convert the current time to Nigerian time
-    const nigerianTime = new Date(currentDate.toLocaleString("en-US", { timeZone: "Africa/Lagos" }));
-
-    // Get the current hour in Nigerian time
-    const currentHour = nigerianTime.getHours();
-
-    // Check if the current hour is within the desired time range
-    const isWithinTimeRange = (currentHour >= 8 && currentHour < 12);
-
+    const {hour} = getNigerianTime()
+    const isWithinTimeRange = (hour >= 8 && hour < 12);
     return isWithinTimeRange
 }
 
 const isEveningReservationTime = () => {
-    const currentDate = new Date();
-
-    // Convert the current time to Nigerian time
-    const nigerianTime = new Date(currentDate.toLocaleString("en-US", { timeZone: "Africa/Lagos" }));
-
-    // Get the current hour in Nigerian time
-    const currentHour = nigerianTime.getHours();
-
-    // Check if the current hour is within the desired time range
-    const isWithinTimeRange = (currentHour >= 17 && currentHour < 21);
-
+    const {hour} = getNigerianTime()
+    const isWithinTimeRange = (hour >= 17 && hour < 21);
     return isWithinTimeRange
+}
+
+const whatReservation = () => {
+    const {hour} = getNigerianTime()
+    if (hour >= 9 && hour < 12) {
+        return 'MORNING';
+    } 
+    else {
+        if ((hour === 12 && minute >= 0) || (hour > 12 && hour < 21)) {
+            return 'EVENING'
+        } 
+        else {
+            return 'MORNING'
+        }
+    }
 }
 
 module.exports = {
     isReservationTime: isReservationTime,
     isMorningReservationTime: isMorningReservationTime,
-    isEveningReservationTime: isEveningReservationTime
+    isEveningReservationTime: isEveningReservationTime,
+    whatReservation: whatReservation,
 }

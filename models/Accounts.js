@@ -39,6 +39,7 @@ const AccountsModel = new Schema({
     last_balance_update: Date,
     balance: Number,
     earnings: Number,
+    reg_date: dateConfig,
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)
