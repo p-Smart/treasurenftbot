@@ -7,6 +7,7 @@ const UploadAccountsHTML = ({query}, res) => {
         const html = `
         <html>
         <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1 user-scalable=no" />
             <style>
                 body {
                     font-family: Arial, sans-serif;
