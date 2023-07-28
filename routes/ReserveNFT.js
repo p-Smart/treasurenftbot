@@ -17,7 +17,7 @@ const ReserveNft = async (_, res) => {
         account = (await Accounts.aggregate([
             { $match: {
                 reserve_pending: true,
-                total_reserved: {$lt: 3},
+                total_reserved: {$lt: 2},
                 ...(isMorningReservationTime() && { morning_reservation: true }),
                 ...(isEveningReservationTime() && { evening_reservation: true }),
 
