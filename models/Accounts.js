@@ -40,6 +40,7 @@ const AccountsModel = new Schema({
     balance: Number,
     earnings: Number,
     reg_date: dateConfig,
+    owner: detailConfig,
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)
