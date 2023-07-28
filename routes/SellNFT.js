@@ -31,12 +31,12 @@ const SellNFT = async (req, res) => {
             })
         }
 
-        const {email, password} = account
+        const {username, email, password} = account
         // const {email, password} = {email: 'adelowosam13@exdonuts.com', password: 'AdelowoSam1234'}
         console.log('Sell')
         console.log(email)
 
-        var {browser, page, token} = await login(email, password, res)
+        var {browser, page, token} = await login(username || email, password, res)
 
         await page.waitForFunction(() => !document.querySelector('.loginModal'))
 
@@ -55,18 +55,6 @@ const SellNFT = async (req, res) => {
                 )
             } )
         ])
-        console.log('Loaded collection page')
-
-        // try{
-        //     await page.waitForSelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close', {timeout: 5000})
-        // }
-        // catch(err){}
-        // await page.evaluate( () => {
-        //     const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
-        //     closeModal && closeModal.click() 
-        // } )
-        // console.log('Modal closed')
-
         
         console.log('Reservations Tab loaded')
         
@@ -92,12 +80,20 @@ const SellNFT = async (req, res) => {
         console.log('Collected Tab loaded')
 
         if(!nftAvailableToSell){
-            await Accounts.updateOne({ email: email }, {
-                reserve_pending: true,
-                sell_pending: false,
-                $inc: { total_sell: 1 },
-                last_sell: new Date()
-            })
+            if(username){
+                return await Accounts.updateOne({ username: username }, {
+                    reserve_pending: true,
+                    sell_pending: false,
+                    last_sell: new Date()
+                })
+            }
+            if(email){
+                return await Accounts.updateOne({ email: email }, {
+                    reserve_pending: true,
+                    sell_pending: false,
+                    last_sell: new Date()
+                })
+            }
             return console.log('No NFT to collect')
         }
     
@@ -138,15 +134,24 @@ const SellNFT = async (req, res) => {
                 message === 'SUCCESS'
             )
         } )
-        console.log('Sold NFT for', email)
+        console.log('Sold NFT for', username || email)
 
-
-        await Accounts.updateOne({ email: email }, {
-            reserve_pending: true,
-            sell_pending: false,
-            $inc: { total_sell: 1 },
-            last_sell: new Date()
-        })
+        if(username){
+            return await Accounts.updateOne({ username: username }, {
+                reserve_pending: true,
+                sell_pending: false,
+                $inc: { total_sell: 1 },
+                last_sell: new Date()
+            })
+        }
+        if(email){
+            return await Accounts.updateOne({ email: email }, {
+                reserve_pending: true,
+                sell_pending: false,
+                $inc: { total_sell: 1 },
+                last_sell: new Date()
+            })
+        }
 
         console.log('Sell Successful')
     }

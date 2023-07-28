@@ -1,27 +1,26 @@
 const login = require("../components/login")
 const Accounts = require("../models/Accounts")
 
-
-const getBalance = async (page) => {
-    return await page.evaluate( () => parseFloat(document.querySelector('.USDTIcon h3.title-black-PR-26.text').textContent) )
-}
-const getEarnings = async (page) => {
-    return await page.evaluate( () => parseFloat(document.querySelector('.income-info-area > :nth-child(2) h4').textContent) )
-}
-
-const UpdateBalance = async (_, res) => {
+const UpdateBalance = async (req, res) => {
     try{
         const startOfToday = new Date().setUTCHours(0, 0, 0, 0)
         const endOfToday = new Date().setUTCHours(23, 59, 59, 999)
+        const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
 
-        const account = await Accounts.findOne({
-            last_balance_update: {
-                $not: {
-                $gte: new Date(startOfToday),
-                $lt: new Date(endOfToday)
-                }
-            }
-        })
+        var account
+
+        account = (await Accounts.aggregate([
+            { $match: {
+                last_balance_update: {
+                    $not: {
+                    $gte: new Date(startOfToday),
+                    $lt: new Date(endOfToday),
+                },
+                },
+                reg_date: {$gt: restartDate},
+            } },
+            { $sample: { size: 1 } }
+        ]))[0]
 
         if(!account){
             return res.json({
@@ -31,33 +30,59 @@ const UpdateBalance = async (_, res) => {
             })
         }
 
-        const {email, password} = account
-        console.log('Updating balance for ', email)
+        const {username, email, password} = account
+        console.log('Updating balance for ', username || email)
 
-        var {browser, page} = await login(email, password, res)
+        var {browser, page} = await login(username || email, password, res, {
+            width: 800,
+            height: 600,
+            showMedia: true
+        })
 
         await page.goto('https://treasurenft.xyz/#/uc/userCenter')
-        console.log('Gone to balance page')
 
+        var acctDetails
+        await page.waitForResponse(async (response) => {
+            try{
+                var {message, data} = await response.json()
+                acctDetails = data
+            }
+            catch(err){}
+            return (
+                (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property') && 
+                response.status() === 200 && 
+                message === 'SUCCESS'
+            )
+        } )
+        const {balance, income} = acctDetails
 
-        await page.waitForSelector('.USDTIcon h3.title-black-PR-26.text')
-        await page.waitForSelector('.income-info-area > :nth-child(2) h4')
+        await page.evaluate( () => {
+            const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
+            closeModal && closeModal.click()
+        } )
 
-        
-        await page.waitForTimeout(3000)
+        await page.waitForTimeout(1000)
+        const screenshot = await page.screenshot({ encoding: 'base64' })
+        const base64String = `data:image/png;base64,${screenshot}`
 
-        const balance = await getBalance(page)
-        const earnings = await getEarnings(page)
-        
-        console.log(balance)
-        console.log(earnings)
+        console.log('Done updating', username || email)
 
-        await Accounts.updateOne({email: email}, {
-            balance: balance,
-            earnings: earnings,
-            last_balance_update: new Date()
-        })
-        console.log('Balance updated')
+        if(username){
+            return await Accounts.updateOne({ username: username }, {
+                balance: balance,
+                earnings: income,
+                image: base64String,
+                last_balance_update: new Date()
+            })
+        }
+        if(email){
+            return await Accounts.updateOne({email: email}, {
+                balance: balance,
+                earnings: income,
+                image: base64String,
+                last_balance_update: new Date()
+            })
+        }
         
     }
     catch(err){

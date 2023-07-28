@@ -87,6 +87,7 @@ const UploadAccountsHTML = ({query}, res) => {
                 <input type="radio" name="owner" value="queen" ${query.owner==='queen' && 'checked'}>Queen
                 
                 <button type="submit">Submit</button>
+                
             </form>
         </body>
         </html>

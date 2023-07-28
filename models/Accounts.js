@@ -41,6 +41,7 @@ const AccountsModel = new Schema({
     earnings: Number,
     reg_date: dateConfig,
     owner: detailConfig,
+    image: String
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)

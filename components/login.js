@@ -1,8 +1,14 @@
 const connToPuppeteer = require("../config/pupConnect")
 
 
-const login =  async (email, password, res) => {
-    const {browser, page} = await connToPuppeteer()
+const login =  async (email, password, res, browserConfig) => {
+    if (browserConfig){
+        const {width, height, showMedia} = browserConfig
+        var {browser, page} = await connToPuppeteer(width, height, showMedia)
+    }
+    else{
+        var {browser, page} = await connToPuppeteer()
+    }
 
     res.json({
         success: true,

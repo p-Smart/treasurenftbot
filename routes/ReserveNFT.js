@@ -36,11 +36,11 @@ const ReserveNft = async (_, res) => {
             })
         }
 
-        const {email, password} = account
+        const {username, email, password} = account
         console.log('Reserve')
-        console.log(email)
+        console.log(username || email)
 
-        var {browser, page, token} = await login(email, password, res)
+        var {browser, page, token} = await login(username || email, password, res)
 
         await page.goto('https://treasurenft.xyz/#/store/defi')
 
@@ -83,12 +83,22 @@ const ReserveNft = async (_, res) => {
 
         console.log('Success')
 
-        await Accounts.updateOne({ email: email }, {
-            reserve_pending: false,
-            sell_pending: true,
-            $inc: { total_reserved: 1 },
-            last_reserve: new Date()
-        })
+        if(username){
+            return await Accounts.updateOne({ username: username }, {
+                reserve_pending: false,
+                sell_pending: true,
+                $inc: { total_reserved: 1 },
+                last_reserve: new Date()
+            })
+        }
+        if(email){
+            return await Accounts.updateOne({ email: email }, {
+                reserve_pending: false,
+                sell_pending: true,
+                $inc: { total_reserved: 1 },
+                last_reserve: new Date()
+            })
+        }
 
         console.log('Reserve Successful')
     }
