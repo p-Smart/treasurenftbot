@@ -2,6 +2,7 @@ const Accounts = require('../models/Accounts')
 const isTimeToSell = require('../components/sellTimeRange')
 const { getStartOfYesterDay, getEndOfYesterday } = require('../components/dates')
 const login = require('../components/login')
+const { setWorkingFalse, setWorkingTrue } = require('../components/Working')
 
 const SellNFT = async (req, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
@@ -18,7 +19,7 @@ const SellNFT = async (req, res) => {
                 sell_pending: true,
                 total_sell: {$lt: 2},
                 last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },
-
+                working: false,
                 reg_date: {$gt: restartDate},
             } },
             { $sample: { size: 1 } }
@@ -31,11 +32,12 @@ const SellNFT = async (req, res) => {
             })
         }
 
-        const {username, email, password} = account
+        var {username, email, password} = account
         // const {email, password} = {email: 'adelowosam13@exdonuts.com', password: 'AdelowoSam1234'}
         console.log('Sell')
         console.log(email)
 
+        await setWorkingTrue(Accounts, username, email)
         var {browser, page, token} = await login(username || email, password, res)
 
         await page.waitForFunction(() => !document.querySelector('.loginModal'))
@@ -170,6 +172,7 @@ const SellNFT = async (req, res) => {
     finally{
         await page?.close()
         await browser?.close()
+        await setWorkingFalse(Accounts, username, email)
     }
 }
 

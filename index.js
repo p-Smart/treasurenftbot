@@ -9,7 +9,7 @@ const UploadAccountsHTML = require('./routes/UploadAccountsHTML')
 const UploadAccounts = require('./routes/UploadAccounts')
 const Accounts = require('./models/Accounts')
 const GetAirdrops = require('./routes/GetAirdrops')
-const UpdateBalance = require('./routes/UpdateBalance')
+const UpdateAccount = require('./routes/UpdateAccount')
 const mongoose = require('mongoose')
 const { whatReservation } = require('./components/reservationTimeRange')
 const DisplayAccounts = require('./routes/DisplayAccounts')
@@ -36,14 +36,14 @@ app.post('/upload-accounts', UploadAccounts)
 
 app.get('/get-airdrops', GetAirdrops)
 
-app.get('/update-account', UpdateBalance)
+app.get('/update-account', UpdateAccount)
 
 app.get('/display-accounts', DisplayAccounts)
 
 
 // app.get('/test', async (_, res) => {
 
-//   const result = await Accounts.updateMany({}, {owner: 'prince'})
+//   const result = await Accounts.updateMany({}, {working: false})
   
 
 //   res.json({

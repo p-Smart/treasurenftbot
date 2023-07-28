@@ -1,3 +1,4 @@
+const { setWorkingFalse, setWorkingTrue } = require("../components/Working")
 const login = require("../components/login")
 const Accounts = require("../models/Accounts")
 
@@ -30,9 +31,10 @@ const UpdateBalance = async (req, res) => {
             })
         }
 
-        const {username, email, password} = account
+        var {username, email, password} = account
         console.log('Updating balance for ', username || email)
 
+        await setWorkingTrue(Accounts, username, email)
         var {browser, page} = await login(username || email, password, res, {
             width: 800,
             height: 600,
@@ -100,6 +102,7 @@ const UpdateBalance = async (req, res) => {
     finally{
         await page?.close()
         await browser?.close()
+        await setWorkingFalse(Accounts, username, email)
     }
 }
 

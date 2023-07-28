@@ -1,3 +1,4 @@
+const {setWorkingFalse, setWorkingTrue} = require('../components/Working');
 const login = require('../components/login');
 const {isEveningReservationTime, isMorningReservationTime} = require('../components/reservationTimeRange');
 const Accounts = require('../models/Accounts')
@@ -20,7 +21,7 @@ const ReserveNft = async (_, res) => {
                 total_reserved: {$lt: 2},
                 ...(isMorningReservationTime() && { morning_reservation: true }),
                 ...(isEveningReservationTime() && { evening_reservation: true }),
-
+                working: false,
                 reg_date: {$gt: restartDate},
             } },
             { $sample: { size: 1 } }
@@ -36,10 +37,12 @@ const ReserveNft = async (_, res) => {
             })
         }
 
-        const {username, email, password} = account
+        var {username, email, password} = account
         console.log('Reserve')
         console.log(username || email)
 
+        await setWorkingTrue(Accounts, username, email)
+        
         var {browser, page, token} = await login(username || email, password, res)
 
         await page.goto('https://treasurenft.xyz/#/store/defi')
@@ -117,6 +120,7 @@ const ReserveNft = async (_, res) => {
     finally{
         await page?.close()
         await browser?.close()
+        await setWorkingFalse(Accounts, username, email)
     }
 }
 
