@@ -3,6 +3,7 @@ const isTimeToSell = require('../components/sellTimeRange')
 const { getStartOfYesterDay, getEndOfYesterday } = require('../components/dates')
 const login = require('../components/login')
 const { setWorkingFalse, setWorkingTrue } = require('../components/Working')
+const connToPuppeteer = require('../config/pupConnect')
 
 const SellNFT = async (req, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
@@ -21,6 +22,7 @@ const SellNFT = async (req, res) => {
                 last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },
                 working: false,
                 reg_date: {$gt: restartDate},
+                incorrect_details: false
             } },
             { $sample: { size: 1 } }
         ]))[0]
@@ -38,7 +40,10 @@ const SellNFT = async (req, res) => {
         console.log(email)
 
         await setWorkingTrue(Accounts, username, email)
-        var {browser, page, token} = await login(username || email, password, res)
+
+        var {browser, page} = await connToPuppeteer()
+        
+        var {token} = await login(username || email, password, res, page)
 
         await page.waitForFunction(() => !document.querySelector('.loginModal'))
 
@@ -82,20 +87,11 @@ const SellNFT = async (req, res) => {
         console.log('Collected Tab loaded')
 
         if(!nftAvailableToSell){
-            if(username){
-                return await Accounts.updateOne({ username: username }, {
-                    reserve_pending: true,
-                    sell_pending: false,
-                    last_sell: new Date()
-                })
-            }
-            if(email){
-                return await Accounts.updateOne({ email: email }, {
-                    reserve_pending: true,
-                    sell_pending: false,
-                    last_sell: new Date()
-                })
-            }
+            await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
+                reserve_pending: true,
+                sell_pending: false,
+                last_sell: new Date()
+            })
             return console.log('No NFT to collect')
         }
     
@@ -138,22 +134,12 @@ const SellNFT = async (req, res) => {
         } )
         console.log('Sold NFT for', username || email)
 
-        if(username){
-            return await Accounts.updateOne({ username: username }, {
-                reserve_pending: true,
-                sell_pending: false,
-                $inc: { total_sell: 1 },
-                last_sell: new Date()
-            })
-        }
-        if(email){
-            return await Accounts.updateOne({ email: email }, {
-                reserve_pending: true,
-                sell_pending: false,
-                $inc: { total_sell: 1 },
-                last_sell: new Date()
-            })
-        }
+        await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
+            reserve_pending: true,
+            sell_pending: false,
+            $inc: { total_sell: 1 },
+            last_sell: new Date()
+        })
 
         console.log('Sell Successful')
     }

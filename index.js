@@ -43,7 +43,7 @@ app.get('/display-accounts', DisplayAccounts)
 
 // app.get('/test', async (_, res) => {
 
-//   const result = await Accounts.updateMany({}, {working: false})
+//   const result = await Accounts.updateMany({}, {incorrect_details: false})
   
 
 //   res.json({

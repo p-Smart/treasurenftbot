@@ -1,14 +1,8 @@
 const connToPuppeteer = require("../config/pupConnect")
+const Accounts = require("../models/Accounts")
 
 
-const login =  async (email, password, res, browserConfig) => {
-    if (browserConfig){
-        const {width, height, showMedia} = browserConfig
-        var {browser, page} = await connToPuppeteer(width, height, showMedia)
-    }
-    else{
-        var {browser, page} = await connToPuppeteer()
-    }
+const login =  async (email, password, res, page) => {
 
     res.json({
         success: true,
@@ -40,23 +34,23 @@ const login =  async (email, password, res, browserConfig) => {
 
     var loginToken
     await page.waitForResponse(async (response) => {
-        try{
+        if(response.url().includes('https://treasurenft.xyz/gateway/app/user/login')){
             var {data, message} = await response.json()
-            loginToken = data.token
+            loginToken = data?.token
+            if (message === 'ACCOUNT_NOT_EXIST' || message === 'ACCOUNT_STATUS_DISABLE'){
+                await Accounts.updateOne({
+                    $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: email, $ne: ''  } }]
+               }, {incorrect_details: true})
+            }
+
+            return response.status() === 200 && message === 'SUCCESS'
         }
-        catch(err){}
-        return (
-            response.url() === 'https://treasurenft.xyz/gateway/app/user/login' && 
-            response.status() === 200 && 
-            message === 'SUCCESS'
-        )
+        return false
     } )
     console.log('Logged In Successfully')
 
 
     return {
-        browser: browser,
-        page: page,
         token: loginToken
     }
 }

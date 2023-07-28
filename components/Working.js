@@ -3,12 +3,10 @@
 
 const setWorkingFalse = async (Accounts, username, email) => {
     try{
-        if(email){
-            return await Accounts.updateOne({email: email}, {working: false})
-        }
-        if(username){
-            return await Accounts.updateOne({username: username}, {working: false})
-        }
+        return await Accounts.updateOne({
+            $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]
+        }, 
+        {working: false})
     }
     catch(err){
         await setWorkingFalse(Accounts)
@@ -18,12 +16,10 @@ const setWorkingFalse = async (Accounts, username, email) => {
 
 const setWorkingTrue =  async (Accounts, username, email) => {
     try{
-        if(email){
-            return await Accounts.updateOne({email: email}, {working: true})
-        }
-        if(username){
-            return await Accounts.updateOne({username: username}, {working: true})
-        }
+        return await Accounts.updateOne({
+            $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]
+        }, 
+        {working: true})
     }
     catch(err){
         await setWorkingTrue(Accounts)

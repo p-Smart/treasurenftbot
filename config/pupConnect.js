@@ -7,9 +7,9 @@ const defaultTimeout = 30000
 
 const connToPuppeteer = async (width, height, showMedia) => {
     // const browser = await pup.launch({
-    //     headless: 'new',
+    //     headless: false,
     //     executablePath: executablePath,
-    // defaultViewport: { width: width || 468, height: height || 736 }
+    //     defaultViewport: { width: width || 468, height: height || 736 }
     // })
 
     const browser = await pup.connect({

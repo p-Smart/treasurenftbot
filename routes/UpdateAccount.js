@@ -1,5 +1,6 @@
 const { setWorkingFalse, setWorkingTrue } = require("../components/Working")
 const login = require("../components/login")
+const connToPuppeteer = require("../config/pupConnect")
 const Accounts = require("../models/Accounts")
 
 const UpdateBalance = async (req, res) => {
@@ -19,6 +20,7 @@ const UpdateBalance = async (req, res) => {
                 },
                 },
                 reg_date: {$gt: restartDate},
+                incorrect_details: false
             } },
             { $sample: { size: 1 } }
         ]))[0]
@@ -32,14 +34,13 @@ const UpdateBalance = async (req, res) => {
         }
 
         var {username, email, password} = account
-        console.log('Updating balance for ', username || email)
+        console.log('Updating account for ', username || email)
 
         await setWorkingTrue(Accounts, username, email)
-        var {browser, page} = await login(username || email, password, res, {
-            width: 800,
-            height: 600,
-            showMedia: true
-        })
+
+        var {browser, page} = await connToPuppeteer(800, 600, true)
+
+    var {token} = await login(username || email, password, res, page)
 
         await page.goto('https://treasurenft.xyz/#/uc/userCenter')
 
@@ -69,35 +70,21 @@ const UpdateBalance = async (req, res) => {
 
         console.log('Done updating', username || email)
 
-        if(username){
-            return await Accounts.updateOne({ username: username }, {
-                balance: balance,
-                earnings: income,
-                image: base64String,
-                last_balance_update: new Date()
-            })
-        }
-        if(email){
-            return await Accounts.updateOne({email: email}, {
-                balance: balance,
-                earnings: income,
-                image: base64String,
-                last_balance_update: new Date()
-            })
-        }
+
+
+        return await Accounts.updateOne({
+            $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]
+        }, 
+        {
+            balance: balance,
+            earnings: income,
+            image: base64String,
+            last_balance_update: new Date()
+        })
         
     }
     catch(err){
-        try{
-            res.status(500).json({
-                error: {
-                    message: err.message
-                }
-            })
-        }
-        catch{
-            console.error(err.message)
-        }
+        console.error(err.message)
     }
     finally{
         await page?.close()
