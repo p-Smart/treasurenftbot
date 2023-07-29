@@ -78,10 +78,6 @@ const UploadAccountsHTML = ({query}, res) => {
                 <input type="radio" name="sell_pending" value="true">True
                 <input type="radio" name="sell_pending" value="false" checked>False
                 
-                <label for="evening_reservation">Reservation:</label>
-                <input type="radio" name="reservation" value="MORNING" ${whatReservation() === 'MORNING' && 'checked'}>Morning
-                <input type="radio" name="reservation" value="EVENING" ${whatReservation() === 'EVENING' && 'checked'}>Evening
-                
                 <label for="owner">Owner:</label>
                 <input type="radio" name="owner" value="prince" ${(query.owner==='prince' || query.owner !== 'queen') && 'checked'}>Prince
                 <input type="radio" name="owner" value="queen" ${query.owner==='queen' && 'checked'}>Queen

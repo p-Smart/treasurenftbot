@@ -5,7 +5,7 @@ const Accounts = require("../models/Accounts");
 
 const UploadAccounts = async ({body, ...req}, res) => {
     try{
-        let {username, email, password, total_reserved, total_sell, reserve_pending, sell_pending, reservation, owner} = body
+        let {username, email, password, total_reserved, total_sell, reserve_pending, sell_pending, owner} = body
 
         const duplicate = await Accounts.findOne({
              $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }] 
@@ -27,8 +27,6 @@ const UploadAccounts = async ({body, ...req}, res) => {
             sell_pending: sell_pending === 'true' ? true : false,
             last_reserve: new Date(new Date().setDate(new Date().getDate() - 1)),
             last_sell: new Date(new Date().setDate(new Date().getDate() - 1)),
-            morning_reservation: reservation === 'MORNING' ||  whatReservation() === 'MORNING',
-            evening_reservation: reservation === 'EVENING' || whatReservation() === 'EVENING',
             reg_date: new Date(),
             owner: owner,
             working: false,

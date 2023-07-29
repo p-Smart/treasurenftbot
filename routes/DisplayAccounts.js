@@ -104,14 +104,6 @@ const DisplayAccounts = async ({ query }, res) => {
                                 <td>${convertDate(item.last_sell)}</td>
                             </tr>
                             <tr>
-                                <th>Morning Reservation</th>
-                                <td>${item.morning_reservation}</td>
-                            </tr>
-                            <tr>
-                                <th>Evening Reservation</th>
-                                <td>${item.evening_reservation}</td>
-                            </tr>
-                            <tr>
                                 <th>Last Airdrop Check</th>
                                 <td>${item.last_airdrop_check || 'Not Updated Yet'}</td>
                             </tr>
