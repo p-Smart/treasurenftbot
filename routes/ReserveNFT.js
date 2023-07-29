@@ -1,4 +1,5 @@
 const {setWorkingFalse, setWorkingTrue} = require('../components/Working');
+const blockMediaRequests = require('../components/blockMediaRequest');
 const login = require('../components/login');
 const {isEveningReservationTime, isMorningReservationTime} = require('../components/reservationTimeRange');
 const connToPuppeteer = require('../config/pupConnect');
@@ -47,7 +48,7 @@ const ReserveNft = async (_, res) => {
 
         await setWorkingTrue(Accounts, username, email)
 
-        var {browser, page} = await connToPuppeteer()
+        var {browser, page} = await connToPuppeteer(800, 600, false)
         
         var {token} = await login(username || email, password, res, page)
 
@@ -100,14 +101,12 @@ const ReserveNft = async (_, res) => {
         })
 
         console.log('Reserve Successful')
-
-
-
         // Update Account details
-        await page.goto('https://treasurenft.xyz/#/uc/userCenter')
+        var page2 = await browser.newPage()
+        await page2.goto('https://treasurenft.xyz/#/uc/userCenter')
 
-        var acctDetails
-        await page.waitForResponse(async (response) => {
+        var acctDetails = {}
+        await page2.waitForResponse(async (response) => {
             try{
                 var {message, data} = await response.json()
                 acctDetails = data
@@ -121,13 +120,13 @@ const ReserveNft = async (_, res) => {
         } )
         const {balance, income} = acctDetails
 
-        await page.evaluate( () => {
+        await page2.evaluate( () => {
             const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
             closeModal && closeModal.click()
         } )
 
-        await page.waitForTimeout(1000)
-        const screenshot = await page.screenshot({ encoding: 'base64' })
+        await page2.waitForTimeout(1000)
+        const screenshot = await page2.screenshot({ encoding: 'base64' })
         const base64String = `data:image/png;base64,${screenshot}`
 
         console.log('Done updating', username || email)
@@ -158,6 +157,7 @@ const ReserveNft = async (_, res) => {
         }
     }
     finally{
+        await page2.close()
         await page?.close()
         await browser?.close()
         await setWorkingFalse(Accounts, username, email)
