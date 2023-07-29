@@ -6,6 +6,7 @@ const Accounts = require('../models/Accounts')
 
 
 const ReserveNft = async (_, res) => {
+    const twentyHoursInMillis = 20 * 60 * 60 * 1000;
     try{
         if(!isMorningReservationTime() && !isEveningReservationTime()){
             return res.json({
@@ -20,15 +21,16 @@ const ReserveNft = async (_, res) => {
             { $match: {
                 reserve_pending: true,
                 total_reserved: {$lt: 2},
-                ...(isMorningReservationTime() && { morning_reservation: true }),
-                ...(isEveningReservationTime() && { evening_reservation: true }),
                 working: false,
                 reg_date: {$gt: restartDate},
-                incorrect_details: false
+                incorrect_details: false,
+
+                $expr: {
+                    $gte: [{ $subtract: [new Date(), "$last_reserve"] }, twentyHoursInMillis]
+                }
             } },
             { $sample: { size: 1 } }
         ]))[0]
-
         // For testing
         // account = await Accounts.findOne({})
 
