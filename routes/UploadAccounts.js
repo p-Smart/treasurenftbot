@@ -31,6 +31,8 @@ const UploadAccounts = async ({body, ...req}, res) => {
             evening_reservation: reservation === 'EVENING' || whatReservation() === 'EVENING',
             reg_date: new Date(),
             owner: owner,
+            working: false,
+            incorrect_details: false
         });
       
         res.json({
