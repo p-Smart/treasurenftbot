@@ -6,17 +6,21 @@ const executablePath = `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672
 const defaultTimeout = 30000
 
 const connToPuppeteer = async (width, height, showMedia) => {
-    // const browser = await pup.launch({
-    //     headless: false,
-    //     executablePath: executablePath,
-    //     defaultViewport: { width: width || 468, height: height || 736 }
-    // })
-
-    const browser = await pup.connect({
-        browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
-        defaultViewport: { width: width || 468, height: height || 736 },
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
+  var browser
+  if(process.env.DEV){
+    browser = await pup.launch({
+      headless: false,
+      executablePath: executablePath,
+      defaultViewport: { width: width || 468, height: height || 736 }
+  })
+  }
+  else{
+    browser = await pup.connect({
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
+      defaultViewport: { width: width || 468, height: height || 736 },
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'],
     }, {timeout: 0})
+  }
     console.log('Browser opened')
 
     const page = await browser.newPage()
