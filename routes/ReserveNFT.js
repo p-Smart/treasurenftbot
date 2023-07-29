@@ -157,7 +157,7 @@ const ReserveNft = async (_, res) => {
         }
     }
     finally{
-        await page2.close()
+        await page2?.close()
         await page?.close()
         await browser?.close()
         await setWorkingFalse(Accounts, username, email)
