@@ -8,12 +8,12 @@ const connToPuppeteer = require('../config/pupConnect')
 const SellNFT = async (req, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
     try{
-        if(!isTimeToSell()){
-            return res.json({
-                success: false,
-                message: 'Not Sell Time'
-            })
-        }
+        // if(!isTimeToSell()){
+        //     return res.json({
+        //         success: false,
+        //         message: 'Not Sell Time'
+        //     })
+        // }
 
         const account = (await Accounts.aggregate([
             { $match: {

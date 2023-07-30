@@ -102,23 +102,50 @@ const ReserveNft = async (_, res) => {
 
         console.log('Reserve Successful')
         // Update Account details
+        
         var page2 = await browser.newPage()
+
+        
         await page2.goto('https://treasurenft.xyz/#/uc/userCenter')
 
         var acctDetails = {}
-        await page2.waitForResponse(async (response) => {
-            try{
-                var {message, data} = await response.json()
-                acctDetails = data
-            }
-            catch(err){}
-            return (
-                (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property') && 
-                response.status() === 200 && 
-                message === 'SUCCESS'
-            )
-        } )
-        const {balance, income} = acctDetails
+        try{
+            await Promise.race([
+                page2.waitForResponse(async (response) => {
+                    try{
+                        var {message} = await response.json()
+                    }
+                    catch(err){}
+                    return (
+                        (response.url()).includes('https://treasurenft.xyz/gateway/app/user/order-count')
+                    )
+                } ),
+                page2.waitForResponse(async (response) => {
+                    try{
+                        var {message, data} = await response.json()
+                        acctDetails = {...data}
+                        // (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property') && console.log(data)
+                        
+                    }
+                    catch(err){}
+                    return (
+                        (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property')
+                    )
+                } )
+            ])
+        }catch(err){console.log(err.message)}
+        console.log('Passed waiting for screenshot stage')
+        var {balance, income} = acctDetails
+
+        if(!balance || !income){
+            const balanceResponse = await page2.evaluate( () => {
+                const balance =  document.querySelector('h3.title-black-PR-26.text').textContent
+                const earnings = document.querySelector('.income-info-area > :nth-child(2) h4.title-black-PR-18').textContent
+                return {balance, earnings}
+            })
+            balance = balanceResponse?.balance
+            income = balanceResponse?.earnings
+        }
 
         await page2.evaluate( () => {
             const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
@@ -139,7 +166,7 @@ const ReserveNft = async (_, res) => {
         {
             balance: balance,
             earnings: income,
-            image: base64String,
+            ...base64String && {image: base64String},
             last_balance_update: new Date()
         })
 
@@ -157,9 +184,11 @@ const ReserveNft = async (_, res) => {
         }
     }
     finally{
-        await page2?.close()
-        await page?.close()
-        await browser?.close()
+        if(!(process.env.DEV)){
+            await page2?.close()
+            await page?.close()
+            await browser?.close()
+        }
         await setWorkingFalse(Accounts, username, email)
     }
 }

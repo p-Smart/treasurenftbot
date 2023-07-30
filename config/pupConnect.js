@@ -11,7 +11,8 @@ const connToPuppeteer = async (width, height, showMedia) => {
     browser = await pup.launch({
       headless: false,
       executablePath: executablePath,
-      defaultViewport: { width: width || 468, height: height || 736 }
+      defaultViewport: { width: width || 468, height: height || 736 },
+      // devtools: true,
   })
   }
   else{
