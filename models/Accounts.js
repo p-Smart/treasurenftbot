@@ -41,7 +41,8 @@ const AccountsModel = new Schema({
     owner: detailConfig,
     image: String,
     working: Boolean,
-    incorrect_details: Boolean
+    incorrect_details: Boolean,
+    account_done: Boolean,
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)

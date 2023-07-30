@@ -26,10 +26,11 @@ const ReserveNft = async (_, res) => {
                 working: false,
                 reg_date: {$gt: restartDate},
                 incorrect_details: false,
+                account_done: {$ne: true},
 
                 $expr: {
                     $gte: [{ $subtract: [new Date(), "$last_reserve"] }, twentyHoursInMillis]
-                }
+                },
             } },
             { $sample: { size: 1 } }
         ]))[0]
@@ -56,6 +57,30 @@ const ReserveNft = async (_, res) => {
         await page.goto('https://treasurenft.xyz/#/store/defi')
 
         console.log('Gone to Reservation Page')
+
+        var reserveBalance
+        await page.waitForResponse(async (response) => {
+            try{
+                var {message, data} = await response.json()
+                if((response.url()).includes('https://treasurenft.xyz/gateway/app/reserve/deposit')){
+                    const rsvBal = data?.reserveBalance
+                    reserveBalance = rsvBal
+
+                }
+            }
+            catch(err){}
+            return (
+                (response.url()).includes('https://treasurenft.xyz/gateway/app/reserve/deposit') &&
+                response.status() === 200
+            )
+        } )
+
+        if(reserveBalance && (parseFloat(reserveBalance) < 50)){
+            console.log('No more reservations on this account')
+            return await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
+                account_done: true
+            })
+        }
 
         await page.waitForSelector((`button.ivu-btn.ivu-btn-success.ivu-btn-long`))
 
