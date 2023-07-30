@@ -21,7 +21,7 @@ const SellNFT = async (req, res) => {
             { $match: {
                 sell_pending: true,
                 total_sell: {$lt: 2},
-                last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },
+                // last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },
                 working: false,
                 reg_date: {$gt: restartDate},
                 incorrect_details: false,
@@ -45,7 +45,7 @@ const SellNFT = async (req, res) => {
         var {username, email, password} = account
         // const {email, password} = {email: 'adelowosam13@exdonuts.com', password: 'AdelowoSam1234'}
         console.log('Sell')
-        console.log(email)
+        console.log(email || username)
 
         await setWorkingTrue(Accounts, username, email)
 
