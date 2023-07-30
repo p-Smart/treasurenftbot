@@ -4,6 +4,7 @@ const { getStartOfYesterDay, getEndOfYesterday } = require('../components/dates'
 const login = require('../components/login')
 const { setWorkingFalse, setWorkingTrue } = require('../components/Working')
 const connToPuppeteer = require('../config/pupConnect')
+const updateAccount = require('../components/UpdateAccount')
 
 const SellNFT = async (req, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
@@ -149,6 +150,8 @@ const SellNFT = async (req, res) => {
         })
 
         console.log('Sell Successful')
+
+        var page2 = await updateAccount(browser, email, username)
     }
     catch(err){
         try{
@@ -163,8 +166,11 @@ const SellNFT = async (req, res) => {
         }
     }
     finally{
-        await page?.close()
-        await browser?.close()
+        if(!(process.env.DEV)){
+            await page2?.close()
+            await page?.close()
+            await browser?.close()
+        }
         await setWorkingFalse(Accounts, username, email)
     }
 }

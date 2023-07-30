@@ -1,3 +1,4 @@
+const updateAccount = require('../components/UpdateAccount');
 const {setWorkingFalse, setWorkingTrue} = require('../components/Working');
 const blockMediaRequests = require('../components/blockMediaRequest');
 const login = require('../components/login');
@@ -48,7 +49,7 @@ const ReserveNft = async (_, res) => {
 
         await setWorkingTrue(Accounts, username, email)
 
-        var {browser, page} = await connToPuppeteer(800, 600, false)
+        var {browser, page} = await connToPuppeteer()
         
         var {token} = await login(username || email, password, res, page)
 
@@ -103,71 +104,7 @@ const ReserveNft = async (_, res) => {
         console.log('Reserve Successful')
         // Update Account details
         
-        var page2 = await browser.newPage()
-
-        
-        await page2.goto('https://treasurenft.xyz/#/uc/userCenter')
-
-        var acctDetails = {}
-        try{
-            await Promise.race([
-                page2.waitForResponse(async (response) => {
-                    try{
-                        var {message} = await response.json()
-                    }
-                    catch(err){}
-                    return (
-                        (response.url()).includes('https://treasurenft.xyz/gateway/app/user/order-count')
-                    )
-                } ),
-                page2.waitForResponse(async (response) => {
-                    try{
-                        var {message, data} = await response.json()
-                        acctDetails = {...data}
-                        // (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property') && console.log(data)
-                        
-                    }
-                    catch(err){}
-                    return (
-                        (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property')
-                    )
-                } )
-            ])
-        }catch(err){console.log(err.message)}
-        console.log('Passed waiting for screenshot stage')
-        var {balance, income} = acctDetails
-
-        if(!balance || !income){
-            const balanceResponse = await page2.evaluate( () => {
-                const balance =  document.querySelector('h3.title-black-PR-26.text').textContent
-                const earnings = document.querySelector('.income-info-area > :nth-child(2) h4.title-black-PR-18').textContent
-                return {balance, earnings}
-            })
-            balance = balanceResponse?.balance
-            income = balanceResponse?.earnings
-        }
-
-        await page2.evaluate( () => {
-            const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
-            closeModal && closeModal.click()
-        } )
-
-        await page2.waitForTimeout(1000)
-        const screenshot = await page2.screenshot({ encoding: 'base64' })
-        const base64String = `data:image/png;base64,${screenshot}`
-
-        console.log('Done updating', username || email)
-
-
-
-        return await Accounts.updateOne({
-            $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]
-        }, 
-        {
-            balance: balance,
-            earnings: income,
-            ...base64String && {image: base64String},
-        })
+        var page2 = await updateAccount(browser, email, username)
 
     }
     catch(err){
