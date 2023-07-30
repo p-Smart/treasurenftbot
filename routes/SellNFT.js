@@ -25,6 +25,7 @@ const SellNFT = async (req, res) => {
                 working: false,
                 reg_date: {$gt: restartDate},
                 incorrect_details: false,
+                account_done: {$ne: true},
 
                 ...!isTimeToSell() && {
                     $expr: {
