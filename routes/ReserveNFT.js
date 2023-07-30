@@ -167,7 +167,6 @@ const ReserveNft = async (_, res) => {
             balance: balance,
             earnings: income,
             ...base64String && {image: base64String},
-            last_balance_update: new Date()
         })
 
     }

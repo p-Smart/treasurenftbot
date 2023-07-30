@@ -7,6 +7,7 @@ const connToPuppeteer = require('../config/pupConnect')
 
 const SellNFT = async (req, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
+    const fiveHours30MinsInMillis = ((5 * 60) + 30) * 60 * 1000;
     try{
         // if(!isTimeToSell()){
         //     return res.json({
@@ -22,7 +23,13 @@ const SellNFT = async (req, res) => {
                 last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },
                 working: false,
                 reg_date: {$gt: restartDate},
-                incorrect_details: false
+                incorrect_details: false,
+
+                ...!isTimeToSell() && {
+                    $expr: {
+                        $gte: [{ $subtract: [new Date(), "$last_reserve"] }, fiveHours30MinsInMillis]
+                    }
+                }
             } },
             { $sample: { size: 1 } }
         ]))[0]
@@ -87,11 +94,11 @@ const SellNFT = async (req, res) => {
         console.log('Collected Tab loaded')
 
         if(!nftAvailableToSell){
-            await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
-                reserve_pending: true,
-                sell_pending: false,
-                last_sell: new Date()
-            })
+            // await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
+            //     reserve_pending: true,
+            //     sell_pending: false,
+            //     last_sell: new Date()
+            // })
             return console.log('No NFT to collect')
         }
     
