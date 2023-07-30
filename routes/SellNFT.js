@@ -96,11 +96,9 @@ const SellNFT = async (req, res) => {
         console.log('Collected Tab loaded')
 
         if(!nftAvailableToSell){
-            // await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
-            //     reserve_pending: true,
-            //     sell_pending: false,
-            //     last_sell: new Date()
-            // })
+            await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
+                account_done: true,
+            })
             return console.log('No NFT to collect')
         }
     
