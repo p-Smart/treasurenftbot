@@ -1,3 +1,4 @@
+const updateAccount = require("../components/UpdateAccount")
 const { setWorkingFalse, setWorkingTrue } = require("../components/Working")
 const login = require("../components/login")
 const connToPuppeteer = require("../config/pupConnect")
@@ -38,57 +39,22 @@ const UpdateBalance = async (req, res) => {
 
         await setWorkingTrue(Accounts, username, email)
 
-        var {browser, page} = await connToPuppeteer(800, 600, true)
+        var {browser, page} = await connToPuppeteer()
 
-    var {token} = await login(username || email, password, res, page)
+        var {token} = await login(username || email, password, res, page)
 
-        await page.goto('https://treasurenft.xyz/#/uc/userCenter')
-
-        var acctDetails
-        await page.waitForResponse(async (response) => {
-            try{
-                var {message, data} = await response.json()
-                acctDetails = data
-            }
-            catch(err){}
-            return (
-                (response.url()).includes('https://treasurenft.xyz/gateway/app/user/property') && 
-                response.status() === 200 && 
-                message === 'SUCCESS'
-            )
-        } )
-        const {balance, income} = acctDetails
-
-        await page.evaluate( () => {
-            const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
-            closeModal && closeModal.click()
-        } )
-
-        await page.waitForTimeout(1000)
-        const screenshot = await page.screenshot({ encoding: 'base64' })
-        const base64String = `data:image/png;base64,${screenshot}`
-
-        console.log('Done updating', username || email)
-
-
-
-        return await Accounts.updateOne({
-            $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]
-        }, 
-        {
-            balance: balance,
-            earnings: income,
-            image: base64String,
-            last_balance_update: new Date()
-        })
+        var page2 = await updateAccount(browser, email, username, true)
         
     }
     catch(err){
         console.error(err.message)
     }
     finally{
-        await page?.close()
-        await browser?.close()
+        if(!(process.env.DEV)){
+            await page2?.close()
+            await page?.close()
+            await browser?.close()
+        }
         await setWorkingFalse(Accounts, username, email)
     }
 }

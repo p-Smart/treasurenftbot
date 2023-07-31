@@ -80,6 +80,10 @@ const DisplayAccounts = async ({ query }, res) => {
                                 <td>${item.password}</td>
                             </tr>
                             <tr>
+                                <th>UID</th>
+                                <td>${item.UID}</td>
+                            </tr>
+                            <tr>
                                 <th>Total Reserved</th>
                                 <td>${item.total_reserved}</td>
                             </tr>

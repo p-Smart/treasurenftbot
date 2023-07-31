@@ -6,7 +6,7 @@ const login =  async (email, password, res, page) => {
 
     res.json({
         success: true,
-        message: 'Passed Reserve Job on to Puppeteer...'
+        message: 'Passed Job on to Puppeteer...'
     })
 
     // So that it redirects to login view

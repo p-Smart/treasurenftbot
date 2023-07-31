@@ -2,7 +2,7 @@ const Accounts = require("../models/Accounts")
 
 
 
-const updateAccount = async (browser, email, username) => {
+const updateAccount = async (browser, email, username, isUpdateRoute) => {
 
     var page2 = await browser.newPage()
     await page2.setViewport({
@@ -42,6 +42,7 @@ const updateAccount = async (browser, email, username) => {
         }catch(err){console.log(err.message)}
         console.log('Passed waiting for screenshot stage')
         var {balance, income} = acctDetails
+        var UID
 
         if(!balance || !income){
             const balanceResponse = await page2.evaluate( () => {
@@ -53,10 +54,16 @@ const updateAccount = async (browser, email, username) => {
             income = balanceResponse?.earnings
         }
 
-        await page2.evaluate( () => {
+        const {userId} = await page2.evaluate( () => {
             const closeModal = document.querySelector('.ivu-modal-wrap.announcement-modal a.ivu-modal-close')
             closeModal && closeModal.click()
+
+            const userId = document.querySelector('.info-area-UID :nth-child(2)').textContent
+            return {
+                userId: userId || ''
+            }
         } )
+        UID = userId
 
         await page2.waitForTimeout(1000)
         const screenshot = await page2.screenshot({ encoding: 'base64' })
@@ -72,7 +79,9 @@ const updateAccount = async (browser, email, username) => {
         {
             balance: balance,
             earnings: income,
+            UID: UID,
             ...base64String && {image: base64String},
+            ...isUpdateRoute && {last_balance_update: new Date(),}
         })
         return page2
 }
