@@ -43,7 +43,7 @@ const SellNFT = async (req, res) => {
             })
         }
 
-        var {username, email, password} = account
+        var {username, email, password, last_reserve} = account
         // const {email, password} = {email: 'adelowosam13@exdonuts.com', password: 'AdelowoSam1234'}
         console.log('Sell')
         console.log(email || username)
@@ -82,7 +82,7 @@ const SellNFT = async (req, res) => {
         await page.waitForResponse(async (response) => {
             try{
                 var {message, data} = await response.json()
-                if(data.total === 0 || data.totalPages === 0){
+                if(data.total === 0 && data.totalPages === 0){
                     nftAvailableToSell = false
                 }
             }
@@ -95,7 +95,7 @@ const SellNFT = async (req, res) => {
         } )
         console.log('Collected Tab loaded')
 
-        if(!nftAvailableToSell){
+        if(!nftAvailableToSell && (new Date() - new Date(last_reserve)) > fiveHours30MinsInMillis){
             await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
                 account_done: true,
             })
