@@ -1,4 +1,5 @@
 const Accounts = require("../models/Accounts");
+const Style = require("../styles/displaypage");
 
 const convertDate = (date) => new Date(date).toLocaleString("en-US", {
     weekday: "long",
@@ -8,61 +9,42 @@ const convertDate = (date) => new Date(date).toLocaleString("en-US", {
     hour: "numeric",
     minute: "numeric",
     second: "numeric",
+    timeZone: "Africa/Lagos",
 });
+const ITEMS_PER_PAGE = 10;
 
 
 
 const DisplayAccounts = async ({ query }, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
+    const mdbQuery = {
+        owner: query.owner || 'prince',
+        reg_date: { $gt: restartDate },
+    }
     try {
-        const accounts = await Accounts.find({
-            owner: query.owner || 'prince',
-            reg_date: { $gt: restartDate }
-        })
+        var {page = 1} = query
+        page = parseInt(page)
+
+
+        const totalAccounts = await Accounts.countDocuments(mdbQuery);
+
+        const accounts = await Accounts.find(mdbQuery)
         .sort({ reg_date: -1 })
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+
+        const totalPages = Math.ceil(totalAccounts / ITEMS_PER_PAGE)
 
 
         const html = `
         <html>
         <head>
             <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                    padding: 10px;
-                    background-color: #f2f2f2;
-                }
-                .container {
-                    max-width: 600px;
-                    margin: 0 auto;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                    background-color: #fff;
-                    border-radius: 5px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                }
-                th, td {
-                    padding: 10px;
-                    border-bottom: 1px solid #ddd;
-                    text-align: left;
-                }
-                th {
-                    background-color: #f2f2f2;
-                }
-                @media screen and (max-width: 600px) {
-                    th, td {
-                        padding: 8px;
-                    }
-                }
-            </style>
+            ${Style()}
         </head>
         <body>
             <div class="container">
-            <h3>Total Accounts: ${accounts.length}</h3>
+            <h3>Total Accounts: ${totalAccounts}</h3>
                 ${accounts
                     .map(
                         (item) => `
@@ -81,7 +63,7 @@ const DisplayAccounts = async ({ query }, res) => {
                             </tr>
                             <tr>
                                 <th>UID</th>
-                                <td>${item.UID}</td>
+                                <td>${item.UID || 'Not Updated Yet'}</td>
                             </tr>
                             <tr>
                                 <th>Total Reserved</th>
@@ -144,7 +126,34 @@ const DisplayAccounts = async ({ query }, res) => {
                     `
                     )
                     .join("")}
+
+
+                    <div class="pagination">
+                    ${Array.from({ length: totalPages }).map((_, index) => {
+                        const pageNumber = index + 1;
+                        return `
+                        <button class="${pageNumber === page ? 'active' : ''}" onclick="gotoPage(${pageNumber})">
+                            ${pageNumber}
+                        </button>
+                        `;
+                    }).join("")}
+                </div>
             </div>
+
+
+
+            <script>
+            function gotoPage(page) {
+                const currentURL = new URL(window.location.href);
+                const queryParams = currentURL.searchParams;
+            
+                queryParams.set('page', page);
+            
+                currentURL.search = queryParams.toString();
+                window.location.href = currentURL.toString();
+            }
+            
+            </script>
         </body>
         </html>
     `;
