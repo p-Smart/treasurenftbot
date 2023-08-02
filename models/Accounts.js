@@ -43,7 +43,8 @@ const AccountsModel = new Schema({
     working: Boolean,
     incorrect_details: Boolean,
     account_done: Boolean,
-    UID: detailConfig
+    UID: detailConfig,
+    level0: Boolean
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)

@@ -5,7 +5,7 @@ const Accounts = require("../models/Accounts");
 
 const UploadAccounts = async ({body, ...req}, res) => {
     try{
-        let {username, email, password, total_reserved, total_sell, reserve_pending, sell_pending, owner} = body
+        let {username, email, password, total_reserved, total_sell, reserve_pending, sell_pending, owner, level0} = body
 
         const duplicate = await Accounts.findOne({
              $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }] 
@@ -30,7 +30,8 @@ const UploadAccounts = async ({body, ...req}, res) => {
             reg_date: new Date(),
             owner: owner,
             working: false,
-            incorrect_details: false
+            incorrect_details: false,
+            level0: level0 === 'true' ? true : false,
         });
       
         res.json({

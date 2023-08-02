@@ -77,6 +77,10 @@ const UploadAccountsHTML = ({query}, res) => {
                 <label for="sell_pending">Sell Pending:</label>
                 <input type="radio" name="sell_pending" value="true">True
                 <input type="radio" name="sell_pending" value="false" checked>False
+
+                <label for="sell_pending">Level0 Account?:</label>
+                <input type="radio" name="level0" value="true">True
+                <input type="radio" name="level0" value="false" checked>False
                 
                 <label for="owner">Owner:</label>
                 <input type="radio" name="owner" value="prince" ${(query.owner==='prince' || query.owner !== 'queen') && 'checked'}>Prince

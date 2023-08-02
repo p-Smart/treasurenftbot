@@ -10,10 +10,16 @@ const UpdateBalance = async (req, res) => {
         const endOfToday = new Date().setUTCHours(23, 59, 59, 999)
         const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
 
+        const twenty4HoursInMilliscs = 24 * 60 * 60 * 1000;
+
         var account
 
         account = (await Accounts.aggregate([
             { $match: {
+                $or: [
+                    {total_sell: {$gte: 2}},
+                    {account_done: true}
+                ],
                 last_balance_update: {
                     $not: {
                     $gte: new Date(startOfToday),
@@ -21,10 +27,16 @@ const UpdateBalance = async (req, res) => {
                 },
                 },
                 reg_date: {$gt: restartDate},
-                incorrect_details: false
+                incorrect_details: false,
+
+                $expr: {
+                    $gte: [{ $subtract: [new Date(), "$last_sell"] }, twenty4HoursInMilliscs]
+                },
             } },
             { $sample: { size: 1 } }
         ]))[0]
+        const {image, ...rest} = account
+        return res.json(rest)
 
         if(!account){
             return res.json({
