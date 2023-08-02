@@ -35,6 +35,7 @@ const UpdateBalance = async (req, res) => {
 
 
                 ...level0 &&  {level0: true},
+                owner: 'prince',
                 // email: 'psmart2002@gmail.com'
             } },
             { $sample: { size: 1 } }
