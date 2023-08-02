@@ -44,7 +44,7 @@ const ReserveNft = async (_, res) => {
             })
         }
 
-        var {username, email, password} = account
+        var {username, email, UID, password} = account
         console.log('Reserve')
         console.log(username || email)
 
@@ -129,7 +129,7 @@ const ReserveNft = async (_, res) => {
         console.log('Reserve Successful')
         // Update Account details
         
-        var page2 = await updateAccount(browser, email, username)
+        var page2 = await updateAccount(browser, email, username, UID, token)
 
     }
     catch(err){

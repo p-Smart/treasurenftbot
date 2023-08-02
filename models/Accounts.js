@@ -44,7 +44,10 @@ const AccountsModel = new Schema({
     incorrect_details: Boolean,
     account_done: Boolean,
     UID: detailConfig,
-    level0: Boolean
+    uplineUID: detailConfig,
+    uplineUsername: detailConfig,
+    level0: Boolean,
+    referrals: Array
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)

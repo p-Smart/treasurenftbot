@@ -43,7 +43,7 @@ const SellNFT = async (req, res) => {
             })
         }
 
-        var {username, email, password, last_reserve, reg_date} = account
+        var {username, email, password, UID, last_reserve, reg_date} = account
         // const {email, password} = {email: 'adelowosam13@exdonuts.com', password: 'AdelowoSam1234'}
         console.log('Sell')
         console.log(email || username)
@@ -152,7 +152,7 @@ const SellNFT = async (req, res) => {
 
         console.log('Sell Successful')
 
-        var page2 = await updateAccount(browser, email, username)
+        var page2 = await updateAccount(browser, email, username, UID, token)
     }
     catch(err){
         try{

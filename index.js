@@ -13,6 +13,7 @@ const UpdateAccount = require('./routes/UpdateAccount')
 const mongoose = require('mongoose')
 const { whatReservation } = require('./components/reservationTimeRange')
 const DisplayAccounts = require('./routes/DisplayAccounts')
+const getUplineId = require('./components/getUplineId')
 
 
 connectToDB()
@@ -43,12 +44,10 @@ app.get('/display-accounts', DisplayAccounts)
 
 // app.get('/test', async (_, res) => {
 
-//   const result = await Accounts.updateMany({}, {working: false})
   
 
 //   res.json({
 //     success: true,
-//     result: result
 //   });
 // })
 

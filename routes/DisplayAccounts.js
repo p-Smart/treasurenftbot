@@ -20,6 +20,7 @@ const DisplayAccounts = async ({ query }, res) => {
     const mdbQuery = {
         owner: query.owner || 'prince',
         reg_date: { $gt: restartDate },
+        level0: {$ne: true}
     }
     try {
         var {page = 1} = query
@@ -66,6 +67,14 @@ const DisplayAccounts = async ({ query }, res) => {
                                 <td>${item.UID || 'Not Updated Yet'}</td>
                             </tr>
                             <tr>
+                                <th>Upline Username</th>
+                                <td>${item.uplineUID || 'Not Updated Yet'}</td>
+                            </tr>
+                            <tr>
+                                <th>Upline UID</th>
+                                <td>${item.uplineUsername || 'Not Updated Yet'}</td>
+                            </tr>
+                            <tr>
                                 <th>Total Reserved</th>
                                 <td>${item.total_reserved}</td>
                             </tr>
@@ -88,14 +97,6 @@ const DisplayAccounts = async ({ query }, res) => {
                             <tr>
                                 <th>Last Sell</th>
                                 <td>${convertDate(item.last_sell)}</td>
-                            </tr>
-                            <tr>
-                                <th>Last Airdrop Check</th>
-                                <td>${item.last_airdrop_check || 'Not Updated Yet'}</td>
-                            </tr>
-                            <tr>
-                                <th>Last Balance Update</th>
-                                <td>${(item.last_balance_update && convertDate(item.last_balance_update) ) || 'Not Updated Yet'}</td>
                             </tr>
                             <tr>
                                 <th>Balance</th>

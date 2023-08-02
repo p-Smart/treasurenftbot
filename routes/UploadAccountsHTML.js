@@ -56,7 +56,7 @@ const UploadAccountsHTML = ({query}, res) => {
         <body>
             <form method="POST" action="/upload-accounts">
                 <label for="username">Username:</label>
-                <input type="text" name="username" id="username" required>
+                <input type="text" name="username" id="username">
                 
                 <label for="email">Email:</label>
                 <input type="email" name="email" id="email">

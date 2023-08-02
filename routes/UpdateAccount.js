@@ -5,6 +5,7 @@ const connToPuppeteer = require("../config/pupConnect")
 const Accounts = require("../models/Accounts")
 
 const UpdateBalance = async (req, res) => {
+    const level0 = req.query.level0
     try{
         const startOfToday = new Date().setUTCHours(0, 0, 0, 0)
         const endOfToday = new Date().setUTCHours(23, 59, 59, 999)
@@ -28,25 +29,29 @@ const UpdateBalance = async (req, res) => {
                 },
                 reg_date: {$gt: restartDate},
                 incorrect_details: false,
-
                 $expr: {
                     $gte: [{ $subtract: [new Date(), "$last_sell"] }, twenty4HoursInMilliscs]
                 },
+
+
+                ...level0 &&  {level0: true},
+                // email: 'psmart2002@gmail.com'
             } },
             { $sample: { size: 1 } }
         ]))[0]
-        const {image, ...rest} = account
-        return res.json(rest)
+        // const {image, ...rest} = account
+        // return res.json(rest)
 
         if(!account){
             return res.json({
                 error: {
-                    message: 'Updated all balances for today'
+                    message: 'Updated all accounts for today'
                 }
             })
         }
 
-        var {username, email, password} = account
+        var {username, email, UID, password} = account
+        // var {username, email, UID, password} = await Accounts.findOne({email: 'michaelolamide1998@macr2.com'})
         console.log('Updating account for ', username || email)
 
         await setWorkingTrue(Accounts, username, email)
@@ -55,7 +60,7 @@ const UpdateBalance = async (req, res) => {
 
         var {token} = await login(username || email, password, res, page)
 
-        var page2 = await updateAccount(browser, email, username, true)
+        var page2 = await updateAccount(browser, email, username, UID, token, true)
         
     }
     catch(err){
