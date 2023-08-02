@@ -17,6 +17,7 @@ const ITEMS_PER_PAGE = 10;
 
 const DisplayDoneAccounts = async ({ query }, res) => {
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
+    const twenty4HoursInMilliscs = 24 * 60 * 60 * 1000;
     const mdbQuery = {
         owner: query.owner || 'prince',
         reg_date: { $gt: restartDate },
@@ -25,6 +26,12 @@ const DisplayDoneAccounts = async ({ query }, res) => {
             {total_sell: {$gte: 2}},
             {account_done: true}
         ],
+        $expr: {
+            $gte: [{ $subtract: [new Date(), "$last_sell"] }, twenty4HoursInMilliscs]
+        },
+
+        balance: {$lt: 50},
+        uplineUID: {$nin: ['', null, undefined]}
     }
     try {
         var {page = 1} = query
@@ -35,8 +42,8 @@ const DisplayDoneAccounts = async ({ query }, res) => {
 
         const accounts = await Accounts.find(mdbQuery)
         .sort([
-            { balance: -1 },
-            { earnings: -1 },
+            [ 'balance', -1 ],
+            [ 'earnings', -1 ],
           ])
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
