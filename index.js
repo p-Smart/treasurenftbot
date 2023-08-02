@@ -14,6 +14,7 @@ const mongoose = require('mongoose')
 const { whatReservation } = require('./components/reservationTimeRange')
 const DisplayAccounts = require('./routes/DisplayAccounts')
 const getUplineId = require('./components/getUplineId')
+const DisplayDoneAccounts = require('./routes/DisplayDoneAccounts')
 
 
 connectToDB()
@@ -40,6 +41,8 @@ app.get('/get-airdrops', GetAirdrops)
 app.get('/update-account', UpdateAccount)
 
 app.get('/display-accounts', DisplayAccounts)
+
+app.get('/display', DisplayDoneAccounts)
 
 
 // app.get('/test', async (_, res) => {
