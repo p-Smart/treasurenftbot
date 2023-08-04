@@ -13,14 +13,31 @@ const convertDate = (date) => new Date(date).toLocaleString("en-US", {
 });
 const ITEMS_PER_PAGE = 10;
 
+const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
+const twenty4HoursInMilliscs = 24 * 60 * 60 * 1000;
 
 
 const DisplayAccounts = async ({ query }, res) => {
-    const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
-    const mdbQuery = {
+    const level0 = query.level0
+    const sorted = query.sorted
+    const mdbQuery = !sorted ?
+    {
         owner: query.owner || 'prince',
         reg_date: { $gt: restartDate },
-        level0: {$ne: true}
+        ...!level0 ? {level0: {$ne: true}} : {level0: true}
+    } :
+    {
+        owner: query.owner || 'prince',
+        reg_date: { $gt: restartDate },
+        level0: {$ne: true},
+        $or: [
+            {total_sell: {$gte: 2}},
+            {account_done: true}
+        ],
+        $expr: {
+            $gte: [{ $subtract: [new Date(), "$last_sell"] }, twenty4HoursInMilliscs]
+        },
+        uplineUID: {$nin: ['', null, undefined]}
     }
     try {
         var {page = 1} = query
@@ -30,7 +47,12 @@ const DisplayAccounts = async ({ query }, res) => {
         const totalAccounts = await Accounts.countDocuments(mdbQuery);
 
         const accounts = await Accounts.find(mdbQuery)
-        .sort({ reg_date: -1 })
+        .sort(!sorted ? 
+            { reg_date: -1 } : 
+        [
+            [ 'balance', -1 ],
+            [ 'earnings', -1 ],
+        ])
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
 

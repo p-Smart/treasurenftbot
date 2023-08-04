@@ -40,20 +40,28 @@ app.get('/get-airdrops', GetAirdrops)
 
 app.get('/update-account', UpdateAccount)
 
-app.get('/display-accounts', DisplayAccounts)
+app.get('/display/all', DisplayAccounts)
 
-app.get('/display', DisplayDoneAccounts)
+app.get('/display/level0', (req, res, next) => {
+  req.query.level0 = true
+  next()
+}, DisplayAccounts)
+
+app.get('/display/sorted', (req, res, next) => {
+  req.query.sorted = true
+  next()
+}, DisplayAccounts)
 
 
-app.get('/test', async (_, res) => {
-  const result = await Accounts.updateMany({owner: 'queen', level0: {$ne: true}}, {last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))})
+// app.get('/test', async (_, res) => {
+//   const result = await Accounts.updateMany({owner: 'queen', level0: {$ne: true}}, {last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))})
   
 
-  res.json({
-    success: true,
-    result
-  });
-})
+//   res.json({
+//     success: true,
+//     result
+//   });
+// })
 
 
 
