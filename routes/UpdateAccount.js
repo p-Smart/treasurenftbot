@@ -30,13 +30,13 @@ const UpdateBalance = async (req, res) => {
                 },
                 reg_date: {$gt: restartDate},
                 working: {$ne: true},
-                incorrect_details: false,
+                incorrect_details: {$ne:true},
                 $expr: {
                     $gte: [{ $subtract: [new Date(), "$last_sell"] }, twenty4HoursInMilliscs]
                 },
 
 
-                ...level0 ?  {level0: true} : {level0: false},
+                ...level0 ?  {level0: true} : {level0: {$ne: true}},
                 ...owner && {owner: owner,}
                 // email: 'psmart2002@gmail.com'
             } },
