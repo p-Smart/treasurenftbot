@@ -22,7 +22,7 @@ const SellNFT = async (req, res) => {
                 sell_pending: true,
                 total_sell: {$lt: 2},
                 // last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },
-                working: false,
+                working: {$ne: true},
                 reg_date: {$gt: restartDate},
                 incorrect_details: false,
                 account_done: {$ne: true},

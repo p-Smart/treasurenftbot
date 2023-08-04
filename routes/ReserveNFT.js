@@ -23,7 +23,7 @@ const ReserveNft = async (_, res) => {
             { $match: {
                 reserve_pending: true,
                 total_reserved: {$lt: 2},
-                working: false,
+                working: {$ne: true},
                 reg_date: {$gt: restartDate},
                 incorrect_details: false,
                 account_done: {$ne: true},

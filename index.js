@@ -45,14 +45,15 @@ app.get('/display-accounts', DisplayAccounts)
 app.get('/display', DisplayDoneAccounts)
 
 
-// app.get('/test', async (_, res) => {
-
+app.get('/test', async (_, res) => {
+  const result = await Accounts.updateMany({owner: 'queen', level0: {$ne: true}}, {last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))})
   
 
-//   res.json({
-//     success: true,
-//   });
-// })
+  res.json({
+    success: true,
+    result
+  });
+})
 
 
 

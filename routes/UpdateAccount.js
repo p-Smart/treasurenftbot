@@ -6,6 +6,7 @@ const Accounts = require("../models/Accounts")
 
 const UpdateBalance = async (req, res) => {
     const level0 = req.query.level0
+    const owner = req.query.owner
     try{
         const startOfToday = new Date().setUTCHours(0, 0, 0, 0)
         const endOfToday = new Date().setUTCHours(23, 59, 59, 999)
@@ -28,14 +29,15 @@ const UpdateBalance = async (req, res) => {
                 },
                 },
                 reg_date: {$gt: restartDate},
+                working: {$ne: true},
                 incorrect_details: false,
                 $expr: {
                     $gte: [{ $subtract: [new Date(), "$last_sell"] }, twenty4HoursInMilliscs]
                 },
 
 
-                ...level0 &&  {level0: true},
-                owner: 'prince',
+                ...level0 ?  {level0: true} : {level0: false},
+                ...owner && {owner: owner,}
                 // email: 'psmart2002@gmail.com'
             } },
             { $sample: { size: 1 } }
