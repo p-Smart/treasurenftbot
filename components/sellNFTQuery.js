@@ -17,6 +17,7 @@ const sellNFTQuery = async () => {
 
     const account =  (await Accounts.aggregate([
         { $match: {
+            owner: 'prince',
             sell_pending: true,
             // total_sell: {$lt: 2},
             // last_sell: { $gte: getStartOfYesterDay(), $lt: getEndOfYesterday() },

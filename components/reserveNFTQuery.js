@@ -6,6 +6,7 @@ const reserveNFTQuery = async (all) => {
 
     const restartDate = new Date('2023-07-25T11:19:45.736+00:00')
     const query = {
+        owner: 'prince',
         reserve_pending: true,
         // total_reserved: { $lt: 2 },
         working: { $ne: true },
