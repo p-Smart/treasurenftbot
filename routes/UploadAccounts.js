@@ -32,6 +32,8 @@ const UploadAccounts = async ({body, ...req}, res) => {
             working: false,
             incorrect_details: false,
             level0: level0 === 'true' ? true : false,
+            reservationBalance: 20,
+            deposited_in: true
         });
       
         res.json({
