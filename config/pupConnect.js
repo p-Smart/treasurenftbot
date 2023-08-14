@@ -1,21 +1,20 @@
 const pup = require('puppeteer-core')
+const setPageSettings = require('../components/setPageSettings')
 const {BROWSERLESS_KEY} = process.env
 const executablePath = `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`
 
 
-const defaultTimeout = 30000
-
 const connToPuppeteer = async (width, height, showMedia) => {
   var browser
-  if(process.env.DEV){
+  if(process.env.DEV || !process.env.PRODUCTION){
     browser = await pup.launch({
-      headless: false,
+      headless: process.env.DEV ? false : 'new',
       executablePath: executablePath,
       defaultViewport: { width: width || 468, height: height || 736 },
-      // devtools: true,
+      devtools: true,
   })
   }
-  else{
+  if(process.env.PRODUCTION){
     browser = await pup.connect({
       browserWSEndpoint: `wss://chrome.browserless.io?token=${BROWSERLESS_KEY}`,
       defaultViewport: { width: width || 468, height: height || 736 },
@@ -23,27 +22,15 @@ const connToPuppeteer = async (width, height, showMedia) => {
     }, {timeout: 0})
   }
     console.log('Browser opened')
-
-    const page = await browser.newPage()
-    page.setDefaultTimeout(defaultTimeout)
     
-    if(!showMedia){
-      await page.setRequestInterception(true)
+    const context = await browser.createIncognitoBrowserContext()
+    const page = await context.newPage()
 
-      page.on('request', (request) => {
-          if (
-            request.resourceType() === 'image' ||
-            request.resourceType() === 'media'
-          ) {
-            request.abort();
-          } else {
-            request.continue();
-          }
-      })
-    }
+    await setPageSettings(page, showMedia)
     
     return {
         browser,
+        context,
         page
     }
 }

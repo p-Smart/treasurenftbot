@@ -2,27 +2,6 @@ const login = require("../components/login")
 const Accounts = require("../models/Accounts")
 
 
-const checkAirdropAvailable = async (page) => {
-    return await page.evaluate( () => {
-        const airdropAvailable = document.querySelector('.ivu-badge .ivu-badge-count')
-        if(airdropAvailable){
-            return true
-        }
-        return false
-    } )    
-}
-
-const airdropButtonDisabled = async (page) => {
-    return await page.evaluate( () => {
-        const airdropButtonDisabled = document.querySelector('button[data-v-a51406d4]').disabled
-        if(airdropButtonDisabled){
-            return true
-        }
-        return false
-    } )
-}
-
-
 const GetAirdrops = async (_, res) => {
     try{
         const startOfToday = new Date().setUTCHours(0, 0, 0, 0)
@@ -45,10 +24,10 @@ const GetAirdrops = async (_, res) => {
             })
         }
 
-        const {email, password} = account
+        const {email, username, password} = account
         console.log('Getting Airdrop for ', email)
 
-        var {browser, page} = await login(email, password, res)
+        var {token} = await login(email || username, password, res, page)
 
         await page.waitForTimeout(2000)
         const airdropAvailable = await checkAirdropAvailable(page)

@@ -26,7 +26,17 @@ const setWorkingTrue =  async (Accounts, username, email) => {
     }
 }
 
+const setAllWorkingFalse = async (Accounts) => {
+    try{
+        return await Accounts.updateMany({}, {working: false})
+    }
+    catch(err){
+        await setAllWorkingFalse(Accounts)
+    }
+}
+
 module.exports = {
     setWorkingFalse,
-    setWorkingTrue
+    setWorkingTrue,
+    setAllWorkingFalse
 }

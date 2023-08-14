@@ -4,10 +4,13 @@ const Accounts = require("../models/Accounts")
 
 const login =  async (email, password, res, page) => {
 
-    res.json({
-        success: true,
-        message: 'Passed Job on to Puppeteer...'
-    })
+    try{
+        res.json({
+            success: true,
+            message: 'Passed Job on to Puppeteer...'
+        })
+    }
+    catch(err){}
 
     // So that it redirects to login view
     await page.goto('https://treasurenft.xyz/#/uc/userCenter')

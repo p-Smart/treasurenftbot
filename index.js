@@ -15,6 +15,12 @@ const { whatReservation } = require('./components/reservationTimeRange')
 const DisplayAccounts = require('./routes/DisplayAccounts')
 const getUplineId = require('./components/getUplineId')
 const DisplayDoneAccounts = require('./routes/DisplayDoneAccounts')
+const connToPuppeteer = require('./config/pupConnect')
+const login = require('./components/login')
+const getPoints = require('./components/GetPoints')
+const getReservationBal = require('./components/getReservationBal')
+const { setAllWorkingFalse } = require('./components/Working')
+const sendTGMessage = require('./components/sendTGMessage')
 
 
 connectToDB()
@@ -53,15 +59,30 @@ app.get('/display/sorted', (req, res, next) => {
 }, DisplayAccounts)
 
 
-// app.get('/test', async (_, res) => {
-//   const result = await Accounts.updateMany({owner: 'queen', level0: {$ne: true}}, {last_balance_update: new Date(new Date().setDate(new Date().getDate() - 1))})
-  
+app.get('/test', async (_, res) => {
+  try{
+    // const {browser, page} = await connToPuppeteer()
 
-//   res.json({
-//     success: true,
-//     result
-//   });
-// })
+    // var {token} = await login('adaonyeala@gmail.com', 'Adaonyeala1234', res, page)
+
+    // await getPoints(page, token)
+    // console.log(await getReservationBal(page, token))
+
+    // document.querySelector('.ivu-select-dropdown-list :nth-child(1)').click()
+    // const result = await sendTGMessage('Reserve done for MEEE')
+
+    // res.json({
+    //   success: true,
+    //   result
+    // })
+  }
+  catch(err){
+    console.error(err.message)
+  }
+  finally{
+
+  }
+})
 
 
 
