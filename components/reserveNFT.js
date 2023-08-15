@@ -46,9 +46,17 @@ const reserveNFT = async (page, token, email, username) => {
         while(reserveBalance >= 18){
             reserveBalance = await getReservationBal(page, token)
 
-            const bestRange = computeBestReservation(reserveBalance)
+            var bestRange = computeBestReservation(reserveBalance)
+
+            const rangeDone = reservationRangesDone.find( (range) =>  range === bestRange)
+
+            if(rangeDone){
+                bestRange = computeBestReservation(reserveBalance, rangeDone)
+
+                if(!bestRange) break
+            }
             
-            if (reserveBalance < 18 || reservationRangesDone.find( (range) =>  range === bestRange)){
+            if (reserveBalance < 18){
                 break
             }
 
