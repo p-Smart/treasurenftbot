@@ -11,7 +11,7 @@ const getAvailNFT = async (page, token) => {
                 "Authorization": token,
             },
         }) ).json()
-        return data?.total || data?.totalPages
+        return ( data?.total && parseInt(data?.total) )
     }, token )
 }
 

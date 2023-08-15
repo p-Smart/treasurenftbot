@@ -21,6 +21,7 @@ const getPoints = require('./components/GetPoints')
 const getReservationBal = require('./components/getReservationBal')
 const { setAllWorkingFalse } = require('./components/Working')
 const sendTGMessage = require('./components/sendTGMessage')
+const computeBestReservation = require('./components/computeBestReservation')
 
 
 connectToDB()
@@ -69,7 +70,7 @@ app.get('/test', async (_, res) => {
     // console.log(await getReservationBal(page, token))
 
     // document.querySelector('.ivu-select-dropdown-list :nth-child(1)').click()
-    // const result = await sendTGMessage('Reserve done for MEEE')
+    // const result = computeBestReservation(305)
 
     // res.json({
     //   success: true,

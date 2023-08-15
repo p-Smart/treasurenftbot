@@ -53,33 +53,41 @@ const sellNFT = async (page, token, email, username) => {
     }
 
 
-    await page.waitForSelector('button.block-btn.ivu-btn.ivu-btn-primary.ivu-btn-long')
-    await page.evaluate( () => document.querySelector('button.block-btn.ivu-btn.ivu-btn-primary.ivu-btn-long').click() )
+    var sellsDone = 1
 
-    console.log('Sell Button Clicked')
+    while (sellsDone <= nftAvailableToSell){
+        await page.waitForSelector('button.block-btn.ivu-btn.ivu-btn-primary.ivu-btn-long')
+        await page.evaluate( () => document.querySelector('button.block-btn.ivu-btn.ivu-btn-primary.ivu-btn-long').click() )
 
-    // Wait for confirm sell sidebar to load
-    await page.waitForResponse(async (response) => {
-        try{
-            var {message} = await response.json()
-        }
-        catch(err){}
-        return (
-            (response.url()).includes('https://treasurenft.xyz/gateway/app/level/fee') &&
-            response.status() === 200 && 
-            message === 'SUCCESS'
-        )
-    } )
+        console.log('Sell Button Clicked')
 
-    console.log('Sell Confirmation page opened')
+        // Wait for confirm sell sidebar to load
+        await page.waitForResponse(async (response) => {
+            try{
+                var {message} = await response.json()
+            }
+            catch(err){}
+            return (
+                (response.url()).includes('https://treasurenft.xyz/gateway/app/level/fee') &&
+                response.status() === 200 && 
+                message === 'SUCCESS'
+            )
+        } )
 
-    await page.waitForSelector('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long')
-    await page.evaluate( () => document.querySelector('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long').click() )
-    console.log('Confirm Sell Button Clicked')
+        console.log('Sell Confirmation page opened')
 
-    // Wait for confirm sell to load
-    await waitForResponse(page, '/app/NFTItem/status')
-    console.log('Sold NFT for', username || email)
+        await page.waitForSelector('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long')
+        await page.evaluate( () => document.querySelector('.footer button.ivu-btn.ivu-btn-primary.ivu-btn-long').click() )
+        console.log('Confirm Sell Button Clicked')
+
+        // Wait for confirm sell to load
+        await waitForResponse(page, '/app/NFTItem/status')
+        console.log('Sold NFT for', username || email)
+
+        await waitForResponse(page, '/app/NFTItem/mine')
+
+        ++sellsDone
+    }
 
     await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
         reserve_pending: true,
@@ -90,7 +98,7 @@ const sellNFT = async (page, token, email, username) => {
     })
 
     console.log('Sell Successful')
-    await sendTGMessage(`Sell successful for ${username || email}`)
+    await sendTGMessage(`Sell successful for ${username || email}. Sold(${nftAvailableToSell})`)
 }
 
 module.exports = sellNFT
