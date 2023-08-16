@@ -55,6 +55,9 @@ const ReserveNft = async (_, res) => {
 
             var {token} = await login(username || email, password, res, page)
 
+            // await page.waitForFunction(() => !document.querySelector('.loginModal'))
+            // console.log('Gotten to homepage')
+
             await reserveNFT(page, token, email, username)
 
             await setWorkingFalse(Accounts, username, email)
@@ -66,7 +69,7 @@ const ReserveNft = async (_, res) => {
 
             if(accountsDone < 10){
                 ++accountsDone
-                return await handleReserveNFT()
+                // return await handleReserveNFT()
             }
             return
         }

@@ -10,6 +10,7 @@ const waitForResponse = require("./waitForResponse")
 
 const reserveNFT = async (page, token, email, username) => {
     await signIn(page, token)
+    console.log('Signed In')
     var reserveBalance
         reserveBalance = await getReservationBal(page, token)
         if(!reserveBalance || (parseFloat(reserveBalance) < 18)){
@@ -20,8 +21,8 @@ const reserveNFT = async (page, token, email, username) => {
             return console.log('Not enough balance to reserve')
         }
 
-
-        await page.goto('https://treasurenft.xyz/#/store/defi')
+        await page.goto('https://treasurenft.xyz/#/store/defi', {waitUntil: 'networkidle0'})
+        console.log('Gotten to reservation page')
 
         await page.waitForResponse(async (response) => {
             try{
@@ -39,10 +40,11 @@ const reserveNFT = async (page, token, email, username) => {
             )
         } )
 
-        console.log('Gone to Reservation Page')
+        console.log('Reservation page data loaded')
 
         const reservationRangesDone = []
 
+        var count = 0
         while(reserveBalance >= 18){
             reserveBalance = await getReservationBal(page, token)
             console.log('Reserve balance', reserveBalance)
@@ -72,8 +74,10 @@ const reserveNFT = async (page, token, email, username) => {
             }, bestRange )
             console.log('Range button clicked')
 
-            await waitForResponse(page, computeUrlToWaitFor(bestRange))
-            console.log('Waited for range response')
+            if(!(count === 0 && bestRange === 1)){
+                await waitForResponse(page, computeUrlToWaitFor(bestRange))
+                console.log('Waited for range response')
+            }
 
             await page.waitForSelector((`button.ivu-btn.ivu-btn-success.ivu-btn-long`))
 
@@ -108,6 +112,7 @@ const reserveNFT = async (page, token, email, username) => {
             })
 
             reservationRangesDone.push(bestRange)
+            ++count;
         }
 
         console.log('Reserve Successful')
