@@ -23,8 +23,6 @@ const reserveNFT = async (page, token, email, username) => {
 
         await page.goto('https://treasurenft.xyz/#/store/defi')
 
-        console.log('Gone to Reservation Page')
-
         await page.waitForResponse(async (response) => {
             try{
                 var {message, data} = await response.json()
@@ -40,6 +38,8 @@ const reserveNFT = async (page, token, email, username) => {
                 response.status() === 200
             )
         } )
+
+        console.log('Gone to Reservation Page')
 
         const reservationRangesDone = []
 
