@@ -54,7 +54,8 @@ const reserveNFT = async (page, token, email, username) => {
             const rangeDone = reservationRangesDone.find( (range) =>  range === bestRange)
 
             if(rangeDone){
-                bestRange = computeBestReservation(reserveBalance, rangeDone)
+                bestRange = computeBestReservation(reserveBalance, rangeDone, reservationRangesDone.length)
+                console.log('New best range', bestRange)
 
                 if(!bestRange) break
             }

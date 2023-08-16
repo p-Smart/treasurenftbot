@@ -1,23 +1,23 @@
 
 
 
-const computeBestReservation = (reservationBalance, rangeDone) => {
+const computeBestReservation = (reservationBalance, rangeDone, reservesDone) => {
     
     if(reservationBalance >= 300){
         if(rangeDone === 4){
-            return 3
+            return 4 - reservesDone
         }
         return 4
     }
     else if ((reservationBalance >= 150  && reservationBalance <= 299.999)){
         if(rangeDone === 3){
-            return 2
+            return 3 - reservesDone
         }
         return 3
     }
     else if (reservationBalance >= 50  && reservationBalance <= 149.999){
         if(rangeDone === 2){
-            return 1
+            return 2 - reservesDone
         }
         return 2
     }
