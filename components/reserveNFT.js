@@ -21,26 +21,25 @@ const reserveNFT = async (page, token, email, username) => {
             return console.log('Not enough balance to reserve')
         }
 
-        await page.goto('https://treasurenft.xyz/#/store/defi', {waitUntil: 'networkidle0'})
-        console.log('Gotten to reservation page')
-
-        await page.waitForResponse(async (response) => {
-            try{
-                var {message, data} = await response.json()
-                if((response.url()).includes('/app/reserve/deposit')){
-                    const rsvBal = data?.reserveBalance
-                    reserveBalance = rsvBal
-
+        await Promise.all([
+            page.goto('https://treasurenft.xyz/#/store/defi', {waitUntil: 'networkidle0'}),
+            page.waitForResponse(async (response) => {
+                try{
+                    var {message, data} = await response.json()
+                    if((response.url()).includes('/app/reserve/deposit')){
+                        const rsvBal = data?.reserveBalance
+                        reserveBalance = rsvBal
+    
+                    }
                 }
-            }
-            catch(err){}
-            return (
-                (response.url()).includes('/app/reserve/deposit') &&
-                response.status() === 200
-            )
-        } )
-
-        console.log('Reservation page data loaded')
+                catch(err){}
+                return (
+                    (response.url()).includes('/app/reserve/deposit') &&
+                    response.status() === 200
+                )
+            } )
+        ])
+        console.log('Gotten to reservation page')
 
         const reservationRangesDone = []
 
