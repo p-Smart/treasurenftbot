@@ -109,12 +109,13 @@ const reserveNFT = async (page, token, email, username) => {
                 $inc: { total_reserved: 1 },
                 last_reserve: new Date()
             })
+            console.log('Reservation', count+1, 'done')
 
             reservationRangesDone.push(bestRange)
             ++count;
         }
 
-        console.log('Reserve Successful')
+        console.log(reservationRangesDone.length, 'Reserve(s) Successful')
         await sendTGMessage(`Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length})`)
 
         // await getPoints(page, token)
