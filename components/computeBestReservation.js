@@ -3,16 +3,28 @@
 
 const computeBestReservation = (reservationBalance, rangeDone) => {
     
-    if(reservationBalance >= 300 && rangeDone !== 4){
+    if(reservationBalance >= 300){
+        if(rangeDone === 4){
+            return 3
+        }
         return 4
     }
-    else if ((reservationBalance >= 150  && reservationBalance <= 299.999) && rangeDone !== 3){
+    else if ((reservationBalance >= 150  && reservationBalance <= 299.999)){
+        if(rangeDone === 3){
+            return 2
+        }
         return 3
     }
-    else if ((reservationBalance >= 50  && reservationBalance <= 149.999) && rangeDone !== 2){
+    else if (reservationBalance >= 50  && reservationBalance <= 149.999){
+        if(rangeDone === 2){
+            return 1
+        }
         return 2
     }
-    else if ((reservationBalance >= 18  && reservationBalance <= 49.999) && rangeDone !== 1){
+    else if ((reservationBalance >= 18  && reservationBalance <= 49.999)){
+        if(rangeDone === 1){
+            return false
+        }
         return 1
     }
 
