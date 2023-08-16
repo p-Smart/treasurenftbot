@@ -69,7 +69,7 @@ const ReserveNft = async (_, res) => {
 
             if(accountsDone < 10){
                 ++accountsDone
-                // return await handleReserveNFT()
+                return await handleReserveNFT()
             }
             return
         }
