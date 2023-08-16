@@ -45,8 +45,10 @@ const reserveNFT = async (page, token, email, username) => {
 
         while(reserveBalance >= 18){
             reserveBalance = await getReservationBal(page, token)
+            console.log('Reserve balance', reserveBalance)
 
             var bestRange = computeBestReservation(reserveBalance)
+            console.log('Best reservation range', bestRange)
 
             const rangeDone = reservationRangesDone.find( (range) =>  range === bestRange)
 
@@ -62,13 +64,16 @@ const reserveNFT = async (page, token, email, username) => {
 
             await page.waitForSelector('.ivu-select-item')
             await page.waitForSelector(`.ivu-select-dropdown-list :nth-child(${bestRange})`)
+            console.log('Waited for Range selectors')
 
             await page.evaluate( (bestRange) => {
                 const rangeButton = document.querySelector(`.ivu-select-dropdown-list :nth-child(${bestRange})`)
                 rangeButton && rangeButton.click()
             }, bestRange )
+            console.log('Range button clicked')
 
             await waitForResponse(page, computeUrlToWaitFor(bestRange))
+            console.log('Waited for range response')
 
             await page.waitForSelector((`button.ivu-btn.ivu-btn-success.ivu-btn-long`))
 
