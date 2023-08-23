@@ -11,7 +11,7 @@ const connToPuppeteer = async (width, height, showMedia) => {
       headless: process.env.DEV ? false : 'new',
       executablePath: executablePath,
       defaultViewport: { width: width || 468, height: height || 736 },
-      devtools: true,
+      devtools: process.env.DEV ? true : false,
   })
   }
   if(process.env.PRODUCTION){

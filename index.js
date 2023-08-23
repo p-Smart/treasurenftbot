@@ -22,6 +22,7 @@ const getReservationBal = require('./components/getReservationBal')
 const { setAllWorkingFalse } = require('./components/Working')
 const sendTGMessage = require('./components/sendTGMessage')
 const computeBestReservation = require('./components/computeBestReservation')
+const ClaimBonus = require('./routes/ClaimBonus')
 
 
 connectToDB()
@@ -49,6 +50,8 @@ app.get('/update-account', UpdateAccount)
 
 app.get('/display/all', DisplayAccounts)
 
+app.get('/claim-bonus', ClaimBonus)
+
 app.get('/display/level0', (req, res, next) => {
   req.query.level0 = true
   next()
@@ -72,7 +75,7 @@ app.get('/test', async (_, res) => {
     // document.querySelector('.ivu-select-dropdown-list :nth-child(1)').click()
     // const result = computeBestReservation(305)
 
-    // res.json({
+    // return res.json({
     //   success: true,
     //   result
     // })

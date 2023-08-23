@@ -2,17 +2,17 @@ const Accounts = require("../models/Accounts")
 const waitForResponse = require("./waitForResponse")
 
 const checkAirdropAvailable = async (page, token) => {
-    await page.evaluate( async (token) => {
+    return await page.evaluate( async (token) => {
         const url = 'https://treasurenft.xyz/gateway/app/treasureBox/record/unOpen/count'
 
         const {data} = await ( await fetch(url, {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 "Authorization": token,
             },
         }) ).json()
 
-        if(data?.count){
+        if(data?.count != 0){
             return true
         }
         return false
@@ -30,6 +30,13 @@ const airdropButtonDisabled = async (page) => {
     } )
 }
 
+const waitUntilButtonEnabled = async (page) => {
+    return await page.waitForFunction( () => {
+        const airdropButtonDisabled = document.querySelector('button[data-v-a51406d4]').disabled
+        return !airdropButtonDisabled
+    } )
+}
+
 
 
 
@@ -40,28 +47,28 @@ const grabAirdrops = async (page, token, email, username) => {
     const airdropAvailable = await checkAirdropAvailable(page, token)
 
     if(!airdropAvailable){
-        console.log('No Airdrop On this Account')
-        return await Accounts.updateOne({email: email}, {
-            last_airdrop_check: new Date()
-        })
+        return console.log('No Airdrop On this Account')
     }
 
     while(true){
         await page.goto('https://treasurenft.xyz/#/Airdrop')
-        await waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/record/all?boxType=RESERVE_BOX')
-        await waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/record/all?boxType=LEVEL_BOX')
+        await Promise.race([
+            waitUntilButtonEnabled(page),
+            Promise.all([
+                waitForResponse(page, '/all?boxType=RESERVE_BOX'),
+                waitForResponse(page, '/all?boxType=LEVEL_BOX')
+            ])
+        ])
+
         const disabled = await airdropButtonDisabled(page)
         if(disabled){
             console.log('All Airdrops grabbed')
-            await Accounts.updateOne({email: email}, {
-                last_airdrop_check: new Date()
-            })
             break
         }
         else{
             await Promise.all([
                 page.evaluate( () => document.querySelector('button[data-v-a51406d4]').click() ),
-                waitForResponse('https://treasurenft.xyz/gateway/app/treasureBox/open')
+                waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/open')
             ])
             console.log('Grabbed Airdrop for', username || email)
         }

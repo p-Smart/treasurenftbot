@@ -137,7 +137,7 @@ const updateAccount = async (browser, email, username, userIDFromDB, token, isUp
             referrals: referrals && referrals,
             uplineUID: uplineUID,
             uplineUsername: uplineUsername,
-            ...isUpdateRoute && {last_balance_update: new Date(),}
+            ...isUpdateRoute && {last_update: new Date(),}
         })
         return page2
 }

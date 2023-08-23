@@ -34,7 +34,7 @@ const AccountsModel = new Schema({
     last_reserve: dateConfig,
     last_sell: dateConfig,
     last_airdrop_check: Date,
-    last_balance_update: Date,
+    last_update: Date,
     balance: Number,
     earnings: Number,
     reg_date: dateConfig,

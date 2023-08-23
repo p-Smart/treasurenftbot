@@ -22,7 +22,7 @@ const UpdateBalance = async (req, res) => {
                     {total_sell: {$gte: 2}},
                     {account_done: true}
                 ],
-                last_balance_update: {
+                last_update: {
                     $not: {
                     $gte: new Date(startOfToday),
                     $lt: new Date(endOfToday),
