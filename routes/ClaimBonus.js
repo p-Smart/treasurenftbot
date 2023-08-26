@@ -46,6 +46,9 @@ const ClaimBonus = async (_, res) => {
 
             var {token} = await login(username || email, password, res, page)
 
+            await page.waitForFunction(() => !document.querySelector('.loginModal'))
+            console.log('Gotten to homepage')
+
             await grabAirdrops(page, token, email, username)
             await getPoints(page, token)
 
