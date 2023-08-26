@@ -6,6 +6,7 @@ const Accounts = require('../models/Accounts')
 const claimBonusQuery = require('../components/claimBonusQuery');
 const grabAirdrops = require('../components/grabAirdrops');
 const getPoints = require('../components/GetPoints');
+const sendTGMessage = require('../components/sendTGMessage');
 
 
 const ClaimBonus = async (_, res) => {
@@ -20,8 +21,8 @@ const ClaimBonus = async (_, res) => {
             })
         }
 
-        // var {username, email, UID, password} = account
-        var {username, email, UID, password} = {username: 'israeltolami', password: 'IsraelTola1234'}
+        var {username, email, UID, password} = account
+        // var {username, email, UID, password} = {username: 'israeltolami', password: 'IsraelTola1234'}
         console.log('Claiming Bonus for', username || email)
 
         var {browser, context, page} = await connToPuppeteer()
@@ -50,7 +51,10 @@ const ClaimBonus = async (_, res) => {
             console.log('Gotten to homepage')
 
             await grabAirdrops(page, token, email, username)
+            await sendTGMessage(`Grabbed Airdrops for ${username || email}`)
+
             await getPoints(page, token)
+            await sendTGMessage(`Grabbed Points for ${username || email}`)
 
             await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
                 last_update: new Date()
@@ -65,7 +69,7 @@ const ClaimBonus = async (_, res) => {
 
             if(accountsDone < 10){
                 ++accountsDone
-                // return await handleClaimBonus()
+                return await handleClaimBonus()
             }
             return
         }
