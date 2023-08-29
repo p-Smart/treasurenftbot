@@ -46,7 +46,7 @@ const reserveNFT = async (page, token, details) => {
         const reservationRangesDone = []
 
         var count = 0
-        while(reserveBalance >= 18+2){
+        while(reserveBalance >= 18){
             var {total_reserved, maxReserves} = await Accounts.findOne({_id: _id})
 
             reserveBalance = await getReservationBal(page, token)
