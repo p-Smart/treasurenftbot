@@ -31,14 +31,14 @@ const reserveNFTQuery = async (all) => {
         if(all){
             return await Accounts.find(query)
         }
-        // const account = (await Accounts.aggregate([
-        //     {
-        //         $match: query
-        //     },
-        //     { $sample: { size: 1 } }
-        // ]))[0]
+        const account = (await Accounts.aggregate([
+            {
+                $match: query
+            },
+            { $sample: { size: 1 } }
+        ]))[0]
 
-        const account = await Accounts.findOne(query).sort({ reg_date: -1 })
+        // const account = await Accounts.findOne(query).sort({ reg_date: -1 })
 
     return account
 }
