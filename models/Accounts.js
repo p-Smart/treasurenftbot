@@ -49,7 +49,8 @@ const AccountsModel = new Schema({
     level0: Boolean,
     referrals: Array,
     deposited_in: Boolean,
-    reservationBalance: Number
+    reservationBalance: Number,
+    maxReserves: Number
   })
 
 const Accounts = mongoose.models.Accounts ||  mongoose.model('Accounts', AccountsModel)

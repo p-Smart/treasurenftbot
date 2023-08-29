@@ -1,14 +1,16 @@
 const Accounts = require("../models/Accounts")
 const getPoints = require("./GetPoints")
-const { computeBestReservation, computeUrlToWaitFor } = require("./computeBestReservation")
+const { computeBestReservation, computeUrlToWaitFor, computeReservation, mapRangeToPrice } = require("./computeBestReservation")
 const signIn = require("./dailySignIn")
 const getReservationBal = require("./getReservationBal")
+const LARGE_NUMBER = require("./largeNumber")
 const sendTGMessage = require("./sendTGMessage")
 const waitForResponse = require("./waitForResponse")
 
 
 
-const reserveNFT = async (page, token, email, username) => {
+const reserveNFT = async (page, token, details) => {
+    var {username, email, reg_date, _id} = details
     await signIn(page, token)
     console.log('Signed In')
     var reserveBalance
@@ -44,20 +46,35 @@ const reserveNFT = async (page, token, email, username) => {
         const reservationRangesDone = []
 
         var count = 0
-        while(reserveBalance >= 18){
+        while(reserveBalance >= 18+2){
+            var {total_reserved, maxReserves} = await Accounts.findOne({_id: _id})
+
             reserveBalance = await getReservationBal(page, token)
             console.log('Reserve balance', reserveBalance)
 
-            var bestRange = computeBestReservation(reserveBalance)
-            console.log('Best reservation range', bestRange)
-
-            const rangeDone = reservationRangesDone.find( (range) =>  range === bestRange)
-
-            if(rangeDone){
-                bestRange = computeBestReservation(reserveBalance, rangeDone, reservationRangesDone.length)
-                console.log('New best range', bestRange)
+            if(maxReserves!==LARGE_NUMBER){
+                var bestRange = computeReservation({
+                    totalReservesNeeded: maxReserves,
+                    totalReservesDone: total_reserved,
+                    rangesDone: reservationRangesDone,
+                    reservationBalance: reserveBalance
+                })
+                console.log(`Best range for total of ${maxReserves} reserves ${bestRange}`)
 
                 if(!bestRange) break
+            }
+            else{
+                var bestRange = computeBestReservation(reserveBalance)
+                console.log('Best reservation range', bestRange)
+
+                const rangeDone = reservationRangesDone.find( (range) =>  range === bestRange)
+
+                if(rangeDone){
+                    bestRange = computeBestReservation(reserveBalance, rangeDone, reservationRangesDone.length)
+                    console.log('New best range', bestRange)
+
+                    if(!bestRange) break
+                }
             }
             
             if (reserveBalance < 18){
@@ -115,9 +132,15 @@ const reserveNFT = async (page, token, email, username) => {
             reservationRangesDone.push(bestRange)
             ++count;
         }
-
+        
         console.log(reservationRangesDone.length, 'Reserve(s) Successful')
-        await sendTGMessage(`Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length})`)
+
+        const isWithinLast48Hours = ( (new Date() - new Date(reg_date)) / (1000 * 60 * 60) ) <= 48
+
+
+        await sendTGMessage(`
+        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length}): [${reservationRangesDone.map( (range) =>  mapRangeToPrice(range))}]
+        `)
 
         // await getPoints(page, token)
 }

@@ -7,7 +7,8 @@ const waitForResponse = require("./waitForResponse")
 
 
 
-const sellNFT = async (page, token, email, username) => {
+const sellNFT = async (page, token, details) => {
+    var {username, email, reg_date, _id} = details
 
     await Promise.all([
         page.goto('https://treasurenft.xyz/#/collection', {timeout: 0}),
@@ -98,7 +99,10 @@ const sellNFT = async (page, token, email, username) => {
     })
 
     console.log('Sell Successful')
-    await sendTGMessage(`Sell successful for ${username || email}. Sold(${nftAvailableToSell})`)
+
+    const isWithinLast48Hours = ( (new Date() - new Date(reg_date)) / (1000 * 60 * 60) ) <= 48
+
+    await sendTGMessage(`${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${nftAvailableToSell})`)
 }
 
 module.exports = sellNFT

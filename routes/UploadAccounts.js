@@ -1,3 +1,4 @@
+const LARGE_NUMBER = require("../components/largeNumber");
 const { whatReservation } = require("../components/reservationTimeRange");
 const Accounts = require("../models/Accounts");
 
@@ -5,7 +6,7 @@ const Accounts = require("../models/Accounts");
 
 const UploadAccounts = async ({body, ...req}, res) => {
     try{
-        let {username, email, password, total_reserved, total_sell, reserve_pending, sell_pending, owner, level0} = body
+        let {username, email, password, total_reserved, total_sell, reserve_pending, sell_pending, owner, level0, max_reserves, reservationBalance} = body
 
         const duplicate = await Accounts.findOne({
              $or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }] 
@@ -32,8 +33,10 @@ const UploadAccounts = async ({body, ...req}, res) => {
             working: false,
             incorrect_details: false,
             level0: level0 === 'true' ? true : false,
-            reservationBalance: 20,
-            deposited_in: true
+            reservationBalance:  reservationBalance || 20,
+            deposited_in: true,
+
+            maxReserves: max_reserves || LARGE_NUMBER
         });
       
         res.json({

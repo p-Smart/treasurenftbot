@@ -58,7 +58,7 @@ const ReserveNft = async (_, res) => {
             await page.waitForFunction(() => !document.querySelector('.loginModal'))
             console.log('Gotten to homepage')
 
-            await reserveNFT(page, token, email, username)
+            await reserveNFT(page, token, account)
 
             await setWorkingFalse(Accounts, username, email)
 

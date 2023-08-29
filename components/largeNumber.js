@@ -1,0 +1,4 @@
+const LARGE_NUMBER = 999999999999999
+
+
+module.exports = LARGE_NUMBER

@@ -50,7 +50,7 @@ const SellNFT = async (req, res) => {
 
             await page.waitForFunction(() => !document.querySelector('.loginModal'))
 
-            await sellNFT(page, token, email, username)
+            await sellNFT(page, token, account)
 
             await setWorkingFalse(Accounts, username, email)
 

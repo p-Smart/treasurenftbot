@@ -14,6 +14,7 @@ const reserveNFTQuery = async (all) => {
         incorrect_details: false,
         account_done: { $ne: true },
         deposited_in: true,
+        $expr: { $lt: ["$total_reserved", "$maxReserves"] },
         $or: [
             { reservationBalance: { $gte: 18 } },
             {
@@ -30,12 +31,14 @@ const reserveNFTQuery = async (all) => {
         if(all){
             return await Accounts.find(query)
         }
-        const account = (await Accounts.aggregate([
-            {
-                $match: query
-            },
-            { $sample: { size: 1 } }
-        ]))[0]
+        // const account = (await Accounts.aggregate([
+        //     {
+        //         $match: query
+        //     },
+        //     { $sample: { size: 1 } }
+        // ]))[0]
+
+        const account = await Accounts.findOne(query).sort({ reg_date: -1 })
 
     return account
 }

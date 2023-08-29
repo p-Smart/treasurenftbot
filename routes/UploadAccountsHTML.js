@@ -69,6 +69,12 @@ const UploadAccountsHTML = ({query}, res) => {
                 
                 <label for="total_sell">Total Sell:</label>
                 <input type="number" name="total_sell" id="total_sell" value="0">
+
+                <label for="reservationBalance">Reservation Balance:</label>
+                <input type="number" name="reservationBalance" id="reservationBalance">
+
+                <label for="max_reserves">Maximum Reserves:</label>
+                <input type="number" name="max_reserves" id="max_reserves">
                 
                 <label for="reserve_pending">Reserve Pending:</label>
                 <input type="radio" name="reserve_pending" value="true" checked>True

@@ -24,6 +24,7 @@ const checkAirdropAvailable = async (page, token) => {
 const airdropButtonDisabled = async (page, buttonType='reservation') => {
     const selector = buttonType==='reservation' ? `button[data-v-a51406d4]` : `button[data-v-debb4840]`
     
+    await page.waitForSelector(selector)
     return await page.evaluate( (selector) => {
         const airdropButtonDisabled = document.querySelector(selector).disabled
         if(airdropButtonDisabled){
@@ -36,6 +37,7 @@ const airdropButtonDisabled = async (page, buttonType='reservation') => {
 const waitUntilButtonEnabled = async (page, buttonType='reservation') => {
     const selector = buttonType==='reservation' ? `button[data-v-a51406d4]` : `button[data-v-debb4840]`
 
+    await page.waitForSelector(selector)
     return await page.waitForFunction( (selector) => {
         const airdropButtonDisabled = document.querySelector(selector).disabled
         return !airdropButtonDisabled
@@ -46,7 +48,7 @@ const waitUntilButtonEnabled = async (page, buttonType='reservation') => {
 const getLevelBoxUnOpened = async (page, token) => {
     return await page.evaluate( async (token) => {
         const extractLevelNumber = (str) => parseInt(str.match(/LEVEL_BOX_(\d+)/)[1])
-
+        
         const url = 'https://treasurenft.xyz/gateway/app/treasureBox/record/all?boxType=LEVEL_BOX'
 
         const {data} = await ( await fetch(url, {
@@ -84,12 +86,12 @@ const grabAirdrops = async (page, token, email, username) => {
 
     while(true){
         await page.goto('https://treasurenft.xyz/#/Airdrop')
-        
+        console.log('airdrop page loaded')
         await Promise.race([
             waitUntilButtonEnabled(page, 'reservation'),
             waitForResponse(page, '/app/treasureBox/record/all')
         ])
-        
+        console.log('waited for button to disable or airdrops to load')
 
         const disabled = await airdropButtonDisabled(page, 'reservation')
         if(disabled){

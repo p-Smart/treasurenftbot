@@ -23,6 +23,7 @@ const { setAllWorkingFalse } = require('./components/Working')
 const sendTGMessage = require('./components/sendTGMessage')
 const computeBestReservation = require('./components/computeBestReservation')
 const ClaimBonus = require('./routes/ClaimBonus')
+const LARGE_NUMBER = require('./components/largeNumber')
 
 
 connectToDB()
@@ -65,15 +66,14 @@ app.get('/display/sorted', (req, res, next) => {
 
 app.get('/test', async (_, res) => {
   try{
-    // const {browser, page} = await connToPuppeteer()
+    // const result = computeBestReservation.computeReservation({
+    //   totalReservesNeeded: 4,
+    //   totalReservesDone: 2,
+    //   rangesDone: [],
+    //   reservationBalance: 172
+    // })
 
-    // var {token} = await login('adaonyeala@gmail.com', 'Adaonyeala1234', res, page)
-
-    // await getPoints(page, token)
-    // console.log(await getReservationBal(page, token))
-
-    // document.querySelector('.ivu-select-dropdown-list :nth-child(1)').click()
-    // const result = computeBestReservation(305)
+    // const result = await Accounts.updateMany({deposited_in: true}, {})
 
     // return res.json({
     //   success: true,
