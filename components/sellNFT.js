@@ -87,22 +87,24 @@ const sellNFT = async (page, token, details) => {
 
         await waitForResponse(page, '/app/NFTItem/mine')
 
+        const newAvailNFTToSell = await getAvailNFT(page, token)
+
+        await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
+            reserve_pending: !newAvailNFTToSell ? true : false,
+            sell_pending: !newAvailNFTToSell ? false : true,
+            $inc: { total_sell: 1 },
+            last_sell: new Date(),
+            reservationBalance: reserveBalance
+        })
+
         ++sellsDone
     }
-
-    await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
-        reserve_pending: true,
-        sell_pending: false,
-        $inc: { total_sell: 1 },
-        last_sell: new Date(),
-        reservationBalance: reserveBalance
-    })
 
     console.log('Sell Successful')
 
     const isWithinLast48Hours = ( (new Date() - new Date(reg_date)) / (1000 * 60 * 60) ) <= 48
 
-    await sendTGMessage(`${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${nftAvailableToSell})`)
+    await sendTGMessage(`${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${sellsDone-1})`)
 }
 
 module.exports = sellNFT
