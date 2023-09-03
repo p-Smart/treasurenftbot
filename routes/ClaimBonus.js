@@ -7,6 +7,7 @@ const claimBonusQuery = require('../components/claimBonusQuery');
 const grabAirdrops = require('../components/grabAirdrops');
 const getPoints = require('../components/GetPoints');
 const sendTGMessage = require('../components/sendTGMessage');
+const genRandomDevice = require('../components/generateRandomDevice');
 
 
 const ClaimBonus = async (_, res) => {
@@ -43,6 +44,7 @@ const ClaimBonus = async (_, res) => {
                 context = await browser.createIncognitoBrowserContext()
                 page = await context.newPage()
                 await setPageSettings(page)
+                await page.emulate(genRandomDevice())
             }
 
             var {token} = await login(username || email, password, res, page)
@@ -69,7 +71,7 @@ const ClaimBonus = async (_, res) => {
 
             if(accountsDone < 10){
                 ++accountsDone
-                return await handleClaimBonus()
+                // return await handleClaimBonus()
             }
             return
         }

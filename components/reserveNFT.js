@@ -2,6 +2,7 @@ const Accounts = require("../models/Accounts")
 const getPoints = require("./GetPoints")
 const { computeBestReservation, computeUrlToWaitFor, computeReservation, mapRangeToPrice } = require("./computeBestReservation")
 const signIn = require("./dailySignIn")
+const fetchIp = require("./fetchIp")
 const getReservationBal = require("./getReservationBal")
 const LARGE_NUMBER = require("./largeNumber")
 const sendTGMessage = require("./sendTGMessage")
@@ -137,9 +138,10 @@ const reserveNFT = async (page, token, details) => {
 
         const isWithinLast48Hours = ( (new Date() - new Date(reg_date)) / (1000 * 60 * 60) ) <= 48
 
-
+        const ipAddress =  await fetchIp(page)
         await sendTGMessage(`
-        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length}): [${reservationRangesDone.map( (range) =>  mapRangeToPrice(range))}]
+        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length}): [${reservationRangesDone.map( (range) =>  mapRangeToPrice(range))}].\n
+        IP: ${ipAddress}
         `)
 
         // await getPoints(page, token)

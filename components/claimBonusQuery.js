@@ -1,4 +1,5 @@
 const Accounts = require("../models/Accounts");
+const LARGE_NUMBER = require("./largeNumber");
 
 const twenty4HoursInMillis = 24 * 60 * 60 * 1000;
 
@@ -11,6 +12,7 @@ const claimBonusQuery = async (all) => {
         reg_date: { $gt: restartDate },
         incorrect_details: {$ne: true},
         deposited_in: true,
+        maxReserves: LARGE_NUMBER,
 
         $expr: {
             $gte: [{ $subtract: [new Date(), "$last_update"] }, twenty4HoursInMillis]

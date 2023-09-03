@@ -25,23 +25,15 @@ const airdropButtonDisabled = async (page, buttonType='reservation') => {
     const selector = buttonType==='reservation' ? `button[data-v-a51406d4]` : `button[data-v-debb4840]`
     
     await page.waitForSelector(selector)
-    return await page.evaluate( (selector) => {
-        const airdropButtonDisabled = document.querySelector(selector).disabled
-        if(airdropButtonDisabled){
-            return true
-        }
-        return false
-    }, selector )
+    return await page.evaluate( (selector) => document.querySelector(selector).disabled, selector )
 }
 
 const waitUntilButtonEnabled = async (page, buttonType='reservation') => {
     const selector = buttonType==='reservation' ? `button[data-v-a51406d4]` : `button[data-v-debb4840]`
 
     await page.waitForSelector(selector)
-    return await page.waitForFunction( (selector) => {
-        const airdropButtonDisabled = document.querySelector(selector).disabled
-        return !airdropButtonDisabled
-    }, selector )
+    console.log('Waited for button to appear')
+    return await page.waitForFunction( (selector) => document.querySelector(selector)?.disabled !== true, selector )
 }
 
 
@@ -71,6 +63,42 @@ const getLevelBoxUnOpened = async (page, token) => {
 }
 
 
+const checkReserveBoxAvailable = async (page, token) => {
+    return await page.evaluate( async (token) => {
+        const url = 'https://treasurenft.xyz/gateway/app/treasureBox/record/all?boxType=RESERVE_BOX'
+
+        const {data} = await ( await fetch(url, {
+            method: 'GET',
+            headers: {
+                "Authorization": token,
+            },
+        }) ).json()
+
+        if(data?.total == 0){
+            return false
+        }
+        return ((data?.pageList)?.filter( ({status}) => status ===  "UNOPENED" ))?.length
+    }, token )
+}
+
+const checkLevelBoxAvailable = async (page, token) => {
+    return await page.evaluate( async (token) => {
+        const url = 'https://treasurenft.xyz/gateway/app/treasureBox/record/all?boxType=LEVEL_BOX'
+
+        const {data} = await ( await fetch(url, {
+            method: 'GET',
+            headers: {
+                "Authorization": token,
+            },
+        }) ).json()
+
+        if(data?.total == 0){
+            return false
+        }
+        return ((data?.pageList)?.filter( ({status}) => status ===  "UNOPENED" ))?.length
+    }, token )
+}
+
 
 
 
@@ -87,30 +115,29 @@ const grabAirdrops = async (page, token, email, username) => {
     while(true){
         await page.goto('https://treasurenft.xyz/#/Airdrop')
         console.log('airdrop page loaded')
-        await Promise.race([
-            waitUntilButtonEnabled(page, 'reservation'),
-            waitForResponse(page, '/app/treasureBox/record/all')
-        ])
-        console.log('waited for button to disable or airdrops to load')
 
-        const disabled = await airdropButtonDisabled(page, 'reservation')
-        if(disabled){
-            console.log('All Airdrops grabbed')
+        const reserveBoxAvail = await checkReserveBoxAvailable(page, token)
+        if(!reserveBoxAvail){
+            console.log('All Reserve Box Airdrops grabbed')
             break
         }
-        else{
-            await Promise.all([
-                page.evaluate( () => document.querySelector('button[data-v-a51406d4]').click() ),
-                waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/open')
-            ])
-            console.log('Grabbed Airdrop for', username || email)
-        }
+        
+        await page.waitForSelector(`button[data-v-a51406d4]`)
+        await page.waitForFunction( () => document.querySelector(`button[data-v-a51406d4]`)?.disabled !== true )
+        console.log('waited for button to enable or airdrops to load')
+        
+        await Promise.all([
+            page.evaluate( () => document.querySelector('button[data-v-a51406d4]').click() ),
+            waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/open')
+        ])
+        console.log('Grabbed Airdrop for', username || email)
+        
 
     }
 
-    airdropAvailable = await checkAirdropAvailable(page, token)
+    var levelBoxAvailable = await checkLevelBoxAvailable(page, token)
 
-    if(airdropAvailable){
+    if(levelBoxAvailable){
         while(true){
             const levelBoxUnopened = await getLevelBoxUnOpened(page, token)
             if(!levelBoxUnopened){

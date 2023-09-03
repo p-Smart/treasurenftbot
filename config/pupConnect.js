@@ -1,5 +1,6 @@
 const pup = require('puppeteer-core')
 const setPageSettings = require('../components/setPageSettings')
+const genRandomDevice = require('../components/generateRandomDevice')
 const {BROWSERLESS_KEY} = process.env
 const executablePath = `C:/Users/Prince/.cache/puppeteer/chrome/win64-113.0.5672.63/chrome-win64/chrome.exe`
 
@@ -27,11 +28,13 @@ const connToPuppeteer = async (width, height, showMedia) => {
     const page = await context.newPage()
 
     await setPageSettings(page, showMedia)
+    await page.emulate(genRandomDevice())
     
     return {
         browser,
         context,
-        page
+        page,
+        
     }
 }
 

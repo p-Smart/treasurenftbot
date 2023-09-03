@@ -11,19 +11,12 @@ const Accounts = require('./models/Accounts')
 const GetAirdrops = require('./routes/GetAirdrops')
 const UpdateAccount = require('./routes/UpdateAccount')
 const mongoose = require('mongoose')
-const { whatReservation } = require('./components/reservationTimeRange')
 const DisplayAccounts = require('./routes/DisplayAccounts')
-const getUplineId = require('./components/getUplineId')
-const DisplayDoneAccounts = require('./routes/DisplayDoneAccounts')
-const connToPuppeteer = require('./config/pupConnect')
-const login = require('./components/login')
-const getPoints = require('./components/GetPoints')
-const getReservationBal = require('./components/getReservationBal')
-const { setAllWorkingFalse } = require('./components/Working')
-const sendTGMessage = require('./components/sendTGMessage')
-const computeBestReservation = require('./components/computeBestReservation')
 const ClaimBonus = require('./routes/ClaimBonus')
-const LARGE_NUMBER = require('./components/largeNumber')
+const genRandomDevice = require('./components/generateRandomDevice')
+const sendTGImage = require('./components/sendTGImage')
+const connToPuppeteer = require('./config/pupConnect')
+const fetchIp = require('./components/fetchIp')
 
 
 connectToDB()
@@ -66,25 +59,21 @@ app.get('/display/sorted', (req, res, next) => {
 
 app.get('/test', async (_, res) => {
   try{
-    // const result = computeBestReservation.computeReservation({
-    //   totalReservesNeeded: 4,
-    //   totalReservesDone: 2,
-    //   rangesDone: [],
-    //   reservationBalance: 172
-    // })
+    var {browser, page} = await connToPuppeteer()
+    await page.goto('https://api.ipify.org/')
+    const result =  await fetchIp(page)
 
-    // const result = await Accounts.updateMany({deposited_in: true}, {})
-
-    // return res.json({
-    //   success: true,
-    //   result
-    // })
+    return res.json({
+      success: true,
+      result
+    })
   }
   catch(err){
     console.error(err.message)
   }
   finally{
-
+    await page?.close()
+    await browser?.close()
   }
 })
 

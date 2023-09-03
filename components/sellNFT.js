@@ -1,4 +1,5 @@
 const Accounts = require("../models/Accounts")
+const fetchIp = require("./fetchIp")
 const getAvailNFT = require("./getAvailNFTToSell")
 const getReservationBal = require("./getReservationBal")
 const sendTGMessage = require("./sendTGMessage")
@@ -104,7 +105,13 @@ const sellNFT = async (page, token, details) => {
 
     const isWithinLast48Hours = ( (new Date() - new Date(reg_date)) / (1000 * 60 * 60) ) <= 48
 
-    await sendTGMessage(`${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${sellsDone-1})`)
+    const ipAddress =  await fetchIp(page)
+    await sendTGMessage(
+        `
+        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${sellsDone-1}).\n
+        IP: ${ipAddress}
+        `
+    )
 }
 
 module.exports = sellNFT
