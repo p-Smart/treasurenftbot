@@ -140,8 +140,7 @@ const reserveNFT = async (page, token, details) => {
 
         const ipAddress =  await fetchIp(page)
         await sendTGMessage(`
-        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length}): [${reservationRangesDone.map( (range) =>  mapRangeToPrice(range))}].\n
-        IP: ${ipAddress}
+        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Reserve successful for ${username || email}. Reserved (${reservationRangesDone.length}): [${reservationRangesDone.map( (range) =>  mapRangeToPrice(range))}].\nIP: ${ipAddress}
         `)
 
         // await getPoints(page, token)

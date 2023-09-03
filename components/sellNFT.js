@@ -10,6 +10,7 @@ const waitForResponse = require("./waitForResponse")
 
 const sellNFT = async (page, token, details) => {
     var {username, email, reg_date, _id} = details
+    const ipAddress =  await fetchIp(page)
 
     await Promise.all([
         page.goto('https://treasurenft.xyz/#/collection', {timeout: 0}),
@@ -50,7 +51,7 @@ const sellNFT = async (page, token, details) => {
             reserve_pending: true,
             reservationBalance: reserveBalance
         })
-        await sendTGMessage(`No NFT to sell for ${username || email}`)
+        await sendTGMessage(`No NFT to sell for ${username || email}.\nIP: ${ipAddress}`)
         return console.log('No NFT to sell')
     }
 
@@ -105,11 +106,9 @@ const sellNFT = async (page, token, details) => {
 
     const isWithinLast48Hours = ( (new Date() - new Date(reg_date)) / (1000 * 60 * 60) ) <= 48
 
-    const ipAddress =  await fetchIp(page)
     await sendTGMessage(
         `
-        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${sellsDone-1}).\n
-        IP: ${ipAddress}
+        ${isWithinLast48Hours ? 'NEW!!! ' : ''}Sell successful for ${username || email}. Sold(${sellsDone-1}).\nIP: ${ipAddress}
         `
     )
 }
