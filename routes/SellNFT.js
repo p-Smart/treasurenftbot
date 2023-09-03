@@ -59,10 +59,10 @@ const SellNFT = async (req, res) => {
                 await context?.close()
             }
 
-            if(accountsDone < 1){
-                ++accountsDone
-                return await handleSellNFT()
-            }
+            // if(accountsDone < 10){
+            //     ++accountsDone
+            //     return await handleSellNFT()
+            // }
             return
         }
 
