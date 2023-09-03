@@ -67,7 +67,7 @@ const ReserveNft = async (_, res) => {
                 await context?.close()
             }
 
-            if(accountsDone < 10){
+            if(accountsDone < 1){
                 ++accountsDone
                 return await handleReserveNFT()
             }
