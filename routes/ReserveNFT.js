@@ -45,6 +45,8 @@ const ReserveNft = async (_, res) => {
                 username = account.username
                 email = account.email
                 password = account.password
+
+                await setWorkingTrue(Accounts, username, email)
                 console.log('Reserve')
                 console.log(username || email)
 

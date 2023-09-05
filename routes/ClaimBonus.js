@@ -8,6 +8,7 @@ const grabAirdrops = require('../components/grabAirdrops');
 const getPoints = require('../components/GetPoints');
 const sendTGMessage = require('../components/sendTGMessage');
 const genRandomDevice = require('../components/generateRandomDevice');
+const fetchIp = require('../components/fetchIp');
 
 
 const ClaimBonus = async (_, res) => {
@@ -39,6 +40,8 @@ const ClaimBonus = async (_, res) => {
                 username = account.username
                 email = account.email
                 password = account.password
+                
+                await setWorkingTrue(Accounts, username, email)
                 console.log('Claiming Bonus for', username || email)
 
                 context = await browser.createIncognitoBrowserContext()
@@ -52,11 +55,12 @@ const ClaimBonus = async (_, res) => {
             await page.waitForFunction(() => !document.querySelector('.loginModal'))
             console.log('Gotten to homepage')
 
-            await grabAirdrops(page, token, email, username)
-            await sendTGMessage(`Grabbed Airdrops for ${username || email}`)
+            const airdropsGrabbed =  await grabAirdrops(page, token, email, username)
+            const ipAddress =  await fetchIp(page)
+            await sendTGMessage(`Grabbed (${airdropsGrabbed}) Airdrops for ${username || email}\nIP: ${ipAddress}`)
 
-            await getPoints(page, token)
-            await sendTGMessage(`Grabbed Points for ${username || email}`)
+            // await getPoints(page, token)
+            // await sendTGMessage(`Grabbed Points for ${username || email}`)
 
             await Accounts.updateOne({$or: [{ email: { $eq: email, $ne: '' } }, { username: { $eq: username, $ne: ''  } }]}, {
                 last_update: new Date()
@@ -69,10 +73,10 @@ const ClaimBonus = async (_, res) => {
                 await context?.close()
             }
 
-            if(accountsDone < 10){
-                ++accountsDone
-                // return await handleClaimBonus()
-            }
+            // if(accountsDone < 10){
+            //     ++accountsDone
+            //     return await handleClaimBonus()
+            // }
             return
         }
 

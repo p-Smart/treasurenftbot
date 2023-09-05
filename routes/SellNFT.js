@@ -39,6 +39,8 @@ const SellNFT = async (req, res) => {
                 username = account.username
                 email = account.email
                 password = account.password
+
+                await setWorkingTrue(Accounts, username, email)
                 console.log('Sell')
                 console.log(email || username)
 
