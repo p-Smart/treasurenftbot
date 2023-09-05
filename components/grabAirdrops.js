@@ -1,4 +1,6 @@
 const Accounts = require("../models/Accounts")
+const fetchIp = require("./fetchIp")
+const sendTGMessage = require("./sendTGMessage")
 const waitForResponse = require("./waitForResponse")
 
 
@@ -104,15 +106,14 @@ const checkLevelBoxAvailable = async (page, token) => {
 
 
 const grabAirdrops = async (page, token, email, username) => {
-    let airdropsGrabbed = 0
+    var airdropsGrabbed = 0
     try{
         var airdropAvailable
 
         airdropAvailable = await checkAirdropAvailable(page, token)
 
-        if(!airdropAvailable){
-            console.log('No Airdrop On this Account')
-            return airdropsGrabbed
+        if(!airdropAvailable){            
+            return console.log('No Airdrop On this Account')
         }
 
         while(true){
@@ -137,51 +138,56 @@ const grabAirdrops = async (page, token, email, username) => {
             ++airdropsGrabbed
         }
 
-        var levelBoxAvailable = await checkLevelBoxAvailable(page, token)
+        // var levelBoxAvailable = await checkLevelBoxAvailable(page, token)
 
-        if(levelBoxAvailable){
-            while(true){
-                const levelBoxUnopened = await getLevelBoxUnOpened(page, token)
-                if(!levelBoxUnopened){
-                    break
-                }
+        // if(levelBoxAvailable){
+        //     while(true){
+        //         const levelBoxUnopened = await getLevelBoxUnOpened(page, token)
+        //         if(!levelBoxUnopened){
+        //             break
+        //         }
 
-                await page.evaluate( () => {
-                    const levelBoxTab = document.querySelectorAll('.ivu-tabs-nav .ivu-tabs-tab')[1]
-                    levelBoxTab.click()
-                } )
+        //         await page.evaluate( () => {
+        //             const levelBoxTab = document.querySelectorAll('.ivu-tabs-nav .ivu-tabs-tab')[1]
+        //             levelBoxTab.click()
+        //         } )
         
-                await page.evaluate( (level) => {
-                    const levelMenu = document.querySelectorAll('.ivu-col.ivu-col-span-4 .navMenu-div')[level-1]
-                    levelMenu.click()
-                }, levelBoxUnopened )
+        //         await page.evaluate( (level) => {
+        //             const levelMenu = document.querySelectorAll('.ivu-col.ivu-col-span-4 .navMenu-div')[level-1]
+        //             levelMenu.click()
+        //         }, levelBoxUnopened )
         
-                await Promise.race([
-                    waitUntilButtonEnabled(page, 'levelUpReward'),
-                    waitForResponse(page, `https://treasurenft.xyz/gateway/app/treasureBox/setting?boxType=LEVEL_BOX_${levelBoxUnopened}`)
-                ])
+        //         await Promise.race([
+        //             waitUntilButtonEnabled(page, 'levelUpReward'),
+        //             waitForResponse(page, `https://treasurenft.xyz/gateway/app/treasureBox/setting?boxType=LEVEL_BOX_${levelBoxUnopened}`)
+        //         ])
 
-                const disabled = await airdropButtonDisabled(page, 'levelUpReward')
-                if(disabled){
-                    console.log('All level up rewards grabbed')
-                    break
-                }
-                else{
-                    await Promise.all([
-                        page.evaluate( () => document.querySelector('button[data-v-debb4840]').click() ),
-                        waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/open')
-                    ])
-                    console.log('Level Up Airdrop Grabbed for', username || email)
-                }
+        //         const disabled = await airdropButtonDisabled(page, 'levelUpReward')
+        //         if(disabled){
+        //             console.log('All level up rewards grabbed')
+        //             break
+        //         }
+        //         else{
+        //             await Promise.all([
+        //                 page.evaluate( () => document.querySelector('button[data-v-debb4840]').click() ),
+        //                 waitForResponse(page, 'https://treasurenft.xyz/gateway/app/treasureBox/open')
+        //             ])
+        //             console.log('Level Up Airdrop Grabbed for', username || email)
+        //         }
 
-                await page.goto('https://treasurenft.xyz/#/Airdrop')
-                ++airdropsGrabbed
-            }
-        }
-
-        return airdropsGrabbed
+        //         await page.goto('https://treasurenft.xyz/#/Airdrop')
+        //         ++airdropsGrabbed
+        //     }
+        // }
     }
     catch(err){console.error(err.message)}
+    finally{
+        const ipAddress =  await fetchIp(page)
+        if(airdropsGrabbed){
+            return await sendTGMessage(`Grabbed (${airdropsGrabbed}) Airdrops for ${username || email}\nIP: ${ipAddress}`)
+        }
+        await sendTGMessage(`No Airdrop to grab for ${username || email}\nIP: ${ipAddress}`)
+    }
 }
 
 module.exports = grabAirdrops

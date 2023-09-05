@@ -6,9 +6,7 @@ const Accounts = require('../models/Accounts')
 const claimBonusQuery = require('../components/claimBonusQuery');
 const grabAirdrops = require('../components/grabAirdrops');
 const getPoints = require('../components/GetPoints');
-const sendTGMessage = require('../components/sendTGMessage');
 const genRandomDevice = require('../components/generateRandomDevice');
-const fetchIp = require('../components/fetchIp');
 
 
 const ClaimBonus = async (_, res) => {
@@ -55,9 +53,7 @@ const ClaimBonus = async (_, res) => {
             await page.waitForFunction(() => !document.querySelector('.loginModal'))
             console.log('Gotten to homepage')
 
-            const airdropsGrabbed =  await grabAirdrops(page, token, email, username)
-            const ipAddress =  await fetchIp(page)
-            await sendTGMessage(`Grabbed (${airdropsGrabbed}) Airdrops for ${username || email}\nIP: ${ipAddress}`)
+            await grabAirdrops(page, token, email, username)
 
             // await getPoints(page, token)
             // await sendTGMessage(`Grabbed Points for ${username || email}`)
